@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Missing Club — Daily Football Puzzle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f0f0f;--bg-card:#1a1a1a;--bg-elevated:#242424;--border:rgba(255,255,255,0.08);--border-strong:rgba(255,255,255,0.18);--text-primary:#f2f0eb;--text-muted:#888;--text-dim:#555;--accent:#f5c518;--accent-dim:rgba(245,197,24,0.15);--red:#e03c31;--green:#27ae60;--radius:10px;--radius-sm:6px;}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;padding-bottom:3rem}
+.site-header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-inner{max-width:560px;margin:0 auto;padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Bebas Neue',sans-serif;letter-spacing:.04em;line-height:1}
+.logo-main{font-size:22px;color:var(--text-primary)}
+.logo-club{font-size:22px;color:var(--accent);margin-left:6px}
+.header-nav{display:flex;gap:4px}
+.nav-btn{background:none;border:1px solid transparent;border-radius:var(--radius-sm);color:var(--text-muted);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:5px 12px;cursor:pointer;transition:all .15s}
+.nav-btn:hover{color:var(--text-primary);border-color:var(--border-strong)}
+.nav-btn.active{color:var(--accent);border-color:var(--accent);background:var(--accent-dim)}
+.view{display:none;max-width:560px;margin:0 auto;padding:1.5rem 1.25rem 0}
+.view.active{display:block}
+.puzzle-meta{text-align:center;margin-bottom:1.1rem}
+.puzzle-badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(245,197,24,.3);border-radius:20px;padding:3px 12px;margin-bottom:.6rem}
+.puzzle-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.03em;color:var(--text-primary);margin-bottom:.25rem}
+.puzzle-sub{font-size:12px;color:var(--text-muted)}
+.timeline-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.timeline{display:flex;flex-direction:column;gap:0}
+.club-row{display:flex;align-items:center;gap:12px;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.club-row:last-child{border-bottom:none}
+.club-num{font-size:11px;color:var(--text-dim);font-weight:600;width:18px;text-align:right;flex-shrink:0}
+.club-dot{width:10px;height:10px;border-radius:50%;background:var(--text-dim);flex-shrink:0}
+.club-dot.known{background:var(--accent)}
+.club-dot.missing{background:var(--text-dim);border:2px dashed var(--accent)}
+.club-info{flex:1;min-width:0}
+.club-name{font-size:15px;font-weight:500;color:var(--text-primary)}
+.club-years{font-size:12px;color:var(--text-muted);margin-top:2px}
+.club-league{font-size:11px;color:var(--text-dim)}
+.missing-slot{display:flex;align-items:center;justify-content:center;padding:.55rem .75rem;background:var(--accent-dim);border:1px dashed rgba(245,197,24,.4);border-radius:var(--radius-sm);color:var(--accent);font-size:14px;font-weight:600;letter-spacing:.05em}
+.guess-section{margin-top:1rem}
+.pips{display:flex;gap:6px;justify-content:center;margin-bottom:.85rem}
+.pip{width:10px;height:10px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border-strong);transition:all .2s}
+.pip.correct{background:var(--green);border-color:var(--green)}
+.pip.wrong{background:var(--red);border-color:var(--red)}
+.guess-input-row{display:flex;gap:8px}
+#guess-input{flex:1;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:15px;padding:10px 14px;outline:none;transition:border .15s}
+#guess-input:focus{border-color:var(--accent)}
+#guess-input::placeholder{color:var(--text-dim)}
+.guess-btn{background:var(--accent);border:none;border-radius:var(--radius-sm);color:#000;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;padding:10px 20px;cursor:pointer}
+.hints-row{display:flex;gap:6px;margin-top:.75rem;flex-wrap:wrap}
+.hint-btn{background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-muted);font-family:'Inter',sans-serif;font-size:12px;padding:5px 10px;cursor:pointer;transition:all .15s}
+.hint-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.hint-btn:disabled{opacity:.4;cursor:default}
+.hint-btn.used{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.hint-reveal{margin-top:.6rem;font-size:13px;color:var(--text-muted);min-height:18px;line-height:1.5}
+.hint-reveal strong{color:var(--text-primary)}
+.result-banner{margin-top:.75rem;border-radius:var(--radius-sm);overflow:hidden}
+.result-msg{padding:.7rem 1rem;font-size:14px;font-weight:500;text-align:center}
+.result-msg.success{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);color:#4ecf82}
+.result-msg.fail{background:rgba(224,60,49,.1);border:1px solid rgba(224,60,49,.25);color:#f07068}
+.post-game-btns{display:flex;gap:8px;margin-top:.75rem;justify-content:center}
+.pg-btn{background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:8px 16px;cursor:pointer}
+.pg-btn:hover{border-color:var(--accent);color:var(--accent)}
+.pg-btn.share-btn{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.archive-grid{display:flex;flex-direction:column;gap:8px}
+.archive-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 1rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border .15s}
+.archive-card:hover{border-color:var(--border-strong)}
+.archive-card-player{font-size:15px;font-weight:500;color:var(--text-primary)}
+.archive-card-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.archive-card-arrow{color:var(--text-dim);font-size:14px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+.stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem .5rem;text-align:center}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text-primary);line-height:1}
+.stat-label{font-size:11px;color:var(--text-muted);margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+.dist-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.dist-label{font-size:12px;color:var(--text-muted);width:50px;text-align:right;flex-shrink:0}
+.dist-bar-wrap{flex:1;background:var(--bg-elevated);border-radius:3px;height:16px;overflow:hidden}
+.dist-bar{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
+.dist-n{font-size:12px;color:var(--text-muted);width:24px;text-align:right;flex-shrink:0}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-size:13px;padding:.6rem 1.1rem;z-index:999;pointer-events:none;white-space:nowrap}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="logo-main">MISSING</span><span class="logo-club">CLUB</span></div>
+    <nav class="header-nav">
+      <button class="nav-btn active" data-view="game" onclick="setView('game')">Today</button>
+      <button class="nav-btn" data-view="archive" onclick="setView('archive')">Archive</button>
+      <button class="nav-btn" data-view="stats" onclick="setView('stats')">Stats</button>
+    </nav>
+  </div>
+</header>
+<div class="view active" id="view-game">
+  <div class="puzzle-meta">
+    <div class="puzzle-badge" id="puzzle-badge">PUZZLE #1</div>
+    <div class="puzzle-title" id="puzzle-title">Loading...</div>
+    <div class="puzzle-sub" id="puzzle-sub"></div>
+  </div>
+  <div class="timeline-card"><div class="timeline" id="timeline"></div></div>
+  <div class="guess-section" id="guess-section">
+    <div class="pips" id="pips">
+      <div class="pip" id="pip-0"></div>
+      <div class="pip" id="pip-1"></div>
+      <div class="pip" id="pip-2"></div>
+    </div>
+    <div class="guess-input-row">
+      <input type="text" id="guess-input" placeholder="Type the missing club…" autocomplete="off" autocorrect="off" spellcheck="false"/>
+      <button class="guess-btn" onclick="submitGuess()">Guess</button>
+    </div>
+    <div class="hints-row">
+      <button class="hint-btn" id="hint-btn-0" onclick="revealHint(0)">Hint 1</button>
+      <button class="hint-btn" id="hint-btn-1" onclick="revealHint(1)">Hint 2</button>
+      <button class="hint-btn" id="hint-btn-2" onclick="revealHint(2)">Hint 3</button>
+    </div>
+    <div class="hint-reveal" id="hint-reveal"></div>
+    <div class="result-banner" id="result-banner"></div>
+  </div>
+  <div class="post-game-btns" id="post-game-btns" style="display:none">
+    <button class="pg-btn share-btn" onclick="shareResult()">Share 📋</button>
+    <button class="pg-btn" onclick="setView('archive')">Archive</button>
+  </div>
+</div>
+<div class="view" id="view-archive">
+  <div class="puzzle-badge" style="margin-bottom:1rem">All Puzzles</div>
+  <div class="archive-grid" id="archive-grid"></div>
+</div>
+<div class="view" id="view-stats">
+  <div class="puzzle-badge" style="margin-bottom:1rem">Your Stats</div>
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-num" id="stat-played">0</div><div class="stat-label">Played</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-wins">0</div><div class="stat-label">Won</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-pct">0%</div><div class="stat-label">Win %</div></div>
+  </div>
+  <div style="margin-bottom:.5rem;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Guess Distribution</div>
+  <div class="dist-row"><div class="dist-label">1st</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-1" style="width:0%"></div></div><div class="dist-n" id="dist-1-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">2nd</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-2" style="width:0%"></div></div><div class="dist-n" id="dist-2-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">3rd</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-3" style="width:0%"></div></div><div class="dist-n" id="dist-3-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">Miss</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-miss" style="width:0%"></div></div><div class="dist-n" id="dist-miss-n">0</div></div>
+</div>
+<script>
+const PUZZLES=[
+{id:1,player:"Christian Vieri",nationality:"Italian",position:"Striker",clubs:[{name:"Torino",years:"1991–93",league:"Serie A"},{name:"Pisa",years:"1993–94",league:"Serie B"},{name:"Ravenna",years:"1994–95",league:"Serie B"},{name:"Venezia",years:"1995",league:"Serie B"},{name:"Atalanta",years:"1995–96",league:"Serie A"},{name:"Juventus",years:"1996–97",league:"Serie A"},{name:"???",years:"1997–98",league:"La Liga"},{name:"Lazio",years:"1998–99",league:"Serie A"},{name:"Inter Milan",years:"1999–2005",league:"Serie A"},{name:"AC Milan",years:"2005–06",league:"Serie A"},{name:"Monaco",years:"2006",league:"Ligue 1"},{name:"Atalanta",years:"2008",league:"Serie A"},{name:"Fiorentina",years:"2008–09",league:"Serie A"}],missingIndex:6,answer:"Atletico Madrid",acceptedAnswers:["atletico madrid","atletico","atlético madrid","atlético"],hints:["La Liga, Spanish top flight","Spanish capital city","Vieri was their record signing — scored 24 goals in one season"]},
+{id:2,player:"Edin Džeko",nationality:"Bosnian",position:"Striker",clubs:[{name:"Željezničar",years:"2003–05",league:"Premier Liga BiH"},{name:"Teplice",years:"2005–07",league:"Czech Liga"},{name:"Wolfsburg",years:"2007–11",league:"Bundesliga"},{name:"Man City",years:"2011–15",league:"Premier League"},{name:"???",years:"2015–21",league:"Serie A"},{name:"Inter Milan",years:"2021–23",league:"Serie A"},{name:"Fenerbahçe",years:"2023–24",league:"Süper Lig"},{name:"Fiorentina",years:"2024–25",league:"Serie A"},{name:"Schalke",years:"2026–",league:"2. Bundesliga"}],missingIndex:4,answer:"Roma",acceptedAnswers:["roma","as roma"],hints:["Serie A, Italian top flight","Italian capital city","He scored 119 goals there — the club's all-time European top scorer"]},
+{id:3,player:"Diego Forlán",nationality:"Uruguayan",position:"Striker",clubs:[{name:"Independiente",years:"1998–2002",league:"Argentine Primera"},{name:"Man United",years:"2002–04",league:"Premier League"},{name:"Villarreal",years:"2004–07",league:"La Liga"},{name:"???",years:"2007–11",league:"La Liga"},{name:"Inter Milan",years:"2011–12",league:"Serie A"},{name:"Internacional",years:"2012–14",league:"Série A"},{name:"Cerezo Osaka",years:"2014–15",league:"J. League"},{name:"Peñarol",years:"2015–16",league:"Uruguayan Primera"},{name:"Mumbai City",years:"2016–17",league:"ISL"},{name:"Kitchee",years:"2017–19",league:"HK Premier"}],missingIndex:3,answer:"Atletico Madrid",acceptedAnswers:["atletico madrid","atletico","atlético madrid","atlético"],hints:["La Liga, Spanish top flight","Spanish capital city","Won the Europa League there — scored the decisive goal in the 2010 final"]},
+{id:4,player:"Dimitri Payet",nationality:"French",position:"Attacking Midfielder",clubs:[{name:"Nantes",years:"2005–07",league:"Ligue 1"},{name:"Saint-Étienne",years:"2007–11",league:"Ligue 1"},{name:"Lille",years:"2011–13",league:"Ligue 1"},{name:"Marseille",years:"2013–15",league:"Ligue 1"},{name:"???",years:"2015–17",league:"Premier League"},{name:"Marseille",years:"2017–24",league:"Ligue 1"}],missingIndex:4,answer:"West Ham",acceptedAnswers:["west ham","west ham united"],hints:["Premier League, English top flight","East London","Named in the PFA Team of the Year — one of the signings of the 2015–16 season"]},
+{id:5,player:"Memphis Depay",nationality:"Dutch",position:"Forward",clubs:[{name:"PSV",years:"2011–15",league:"Eredivisie"},{name:"Man United",years:"2015–17",league:"Premier League"},{name:"Lyon",years:"2017–21",league:"Ligue 1"},{name:"???",years:"2021–22",league:"La Liga"},{name:"Atletico Madrid",years:"2022–23",league:"La Liga"},{name:"Corinthians",years:"2024",league:"Série A"},{name:"Bragantino",years:"2024–",league:"Série A"}],missingIndex:3,answer:"Barcelona",acceptedAnswers:["barcelona","fc barcelona","barca","barça"],hints:["La Liga, Spanish top flight","Catalonia, northeast Spain","Signed on a free — wore the famous number 9 shirt"]},
+{id:6,player:"Keita Baldé",nationality:"Senegalese",position:"Winger",clubs:[{name:"Lazio",years:"2011–17",league:"Serie A"},{name:"???",years:"2017–18",league:"Ligue 1"},{name:"Inter Milan",years:"2018–19",league:"Serie A"},{name:"Sampdoria",years:"2019–20",league:"Serie A"},{name:"Cagliari",years:"2020–21",league:"Serie A"},{name:"Lokomotiv Moscow",years:"2021–22",league:"Russian PL"},{name:"Udinese",years:"2022–23",league:"Serie A"}],missingIndex:1,answer:"Monaco",acceptedAnswers:["monaco","as monaco"],hints:["Ligue 1, French top flight","Principality on the French Riviera","Joined the same summer they lost Mbappé and Bernardo Silva"]},
+{id:7,player:"Arturo Vidal",nationality:"Chilean",position:"Midfielder",clubs:[{name:"Colo-Colo",years:"2005–07",league:"Primera División"},{name:"Bayer Leverkusen",years:"2007–11",league:"Bundesliga"},{name:"Juventus",years:"2011–15",league:"Serie A"},{name:"???",years:"2015–18",league:"Bundesliga"},{name:"Barcelona",years:"2018–20",league:"La Liga"},{name:"Inter Milan",years:"2020–22",league:"Serie A"},{name:"Flamengo",years:"2022–24",league:"Série A"}],missingIndex:3,answer:"Bayern Munich",acceptedAnswers:["bayern munich","bayern","fc bayern","fc bayern munich"],hints:["Bundesliga, German top flight","Munich, Bavaria","Won 3 consecutive Bundesliga titles there — cult figure at the Allianz Arena"]},
+{id:8,player:"Esteban Cambiasso",nationality:"Argentine",position:"Midfielder",clubs:[{name:"Independiente",years:"1997–2000",league:"Argentine Primera"},{name:"Real Madrid",years:"2000–02",league:"La Liga"},{name:"???",years:"2002–04",league:"La Liga"},{name:"Real Madrid",years:"2004",league:"La Liga"},{name:"Inter Milan",years:"2004–14",league:"Serie A"},{name:"Leicester City",years:"2014–15",league:"Premier League"},{name:"Olympiacos",years:"2015–16",league:"Super League"}],missingIndex:2,answer:"Zaragoza",acceptedAnswers:["zaragoza","real zaragoza"],hints:["La Liga, Spanish top flight","Aragon, northeast Spain","On loan from Real Madrid — won the Copa del Rey with them in 2004"]},
+{id:9,player:"Graziano Pellè",nationality:"Italian",position:"Striker",clubs:[{name:"Lecce",years:"2002–05",league:"Serie A/B"},{name:"Parma",years:"2005–07",league:"Serie A"},{name:"Sampdoria",years:"2007–09",league:"Serie A"},{name:"Bologna",years:"2009–10",league:"Serie A"},{name:"Crotone",years:"2010–11",league:"Serie B"},{name:"AZ Alkmaar",years:"2011–12",league:"Eredivisie"},{name:"Feyenoord",years:"2012–14",league:"Eredivisie"},{name:"???",years:"2014–16",league:"Premier League"},{name:"Shandong",years:"2016–20",league:"Chinese SL"},{name:"Parma",years:"2021–22",league:"Serie B"}],missingIndex:7,answer:"Southampton",acceptedAnswers:["southampton","saints"],hints:["Premier League, English top flight","South coast of England","Scored 12 PL goals in his debut season — fan favourite at St Mary's"]},
+{id:10,player:"Wojciech Szczęsny",nationality:"Polish",position:"Goalkeeper",clubs:[{name:"Arsenal",years:"2006–15",league:"Premier League"},{name:"???",years:"2011–12",league:"Championship"},{name:"Roma",years:"2015–17",league:"Serie A"},{name:"Juventus",years:"2017–24",league:"Serie A"},{name:"Barcelona",years:"2024–",league:"La Liga"}],missingIndex:1,answer:"Brentford",acceptedAnswers:["brentford","brentford fc"],hints:["Championship, English second tier (2011–12)","West London","On loan from Arsenal — helped them win promotion to the Premier League"]},
+{id:11,player:"Pepe Reina",nationality:"Spanish",position:"Goalkeeper",clubs:[{name:"Barcelona B",years:"2000–02",league:"Segunda B"},{name:"Villarreal",years:"2002–05",league:"La Liga"},{name:"Liverpool",years:"2005–14",league:"Premier League"},{name:"???",years:"2013–14",league:"Serie A"},{name:"Bayern Munich",years:"2014–15",league:"Bundesliga"},{name:"Napoli",years:"2015–18",league:"Serie A"},{name:"AC Milan",years:"2018–19",league:"Serie A"},{name:"Aston Villa",years:"2019–20",league:"Premier League"},{name:"Lazio",years:"2020–24",league:"Serie A"},{name:"Como",years:"2024–25",league:"Serie A"}],missingIndex:3,answer:"Napoli",acceptedAnswers:["napoli","ssc napoli"],hints:["Serie A, Italian top flight","City in southern Italy","On loan from Liverpool — his first spell before returning permanently later"]}
+,{id:12,player:"Michael Essien",nationality:"Ghanaian",position:"Midfielder",clubs:[{name:"Liberty Professionals",years:"2000–02",league:"Ghana Premier"},{name:"Bastia",years:"2002–03",league:"Ligue 2"},{name:"Lyon",years:"2003–05",league:"Ligue 1"},{name:"Chelsea",years:"2005–14",league:"Premier League"},{name:"???",years:"2012–13",league:"La Liga"},{name:"AC Milan",years:"2014–15",league:"Serie A"},{name:"Panathinaikos",years:"2015–16",league:"Super League"}],missingIndex:4,answer:"Real Madrid",acceptedAnswers:["real madrid","madrid"],hints:["La Liga, Spanish top flight","Spanish capital city","On loan from Chelsea — won the Champions League there in his only season"]}
+,{id:13,player:"Cesc Fabregas",nationality:"Spanish",position:"Midfielder",clubs:[{name:"Arsenal",years:"2003–11",league:"Premier League"},{name:"Barcelona",years:"2011–14",league:"La Liga"},{name:"Chelsea",years:"2014–19",league:"Premier League"},{name:"Monaco",years:"2019–22",league:"Ligue 1"},{name:"???",years:"2022–",league:"Serie A"}],missingIndex:4,answer:"Como",acceptedAnswers:["como","como 1907"],hints:["Serie A, Italian top flight","Lake Como, northern Italy","Became their player-manager — signed Pepe Reina to join him there"]}
+,{id:14,player:"Marcos Alonso",nationality:"Spanish",position:"Left Back",clubs:[{name:"Real Madrid B",years:"2008–10",league:"Segunda B"},{name:"Bolton",years:"2010–13",league:"Premier League"},{name:"???",years:"2013–16",league:"Serie A"},{name:"Chelsea",years:"2016–22",league:"Premier League"},{name:"Barcelona",years:"2022–24",league:"La Liga"}],missingIndex:2,answer:"Fiorentina",acceptedAnswers:["fiorentina","acf fiorentina"],hints:["Serie A, Italian top flight","Florence, Tuscany","Three seasons there — fan favourite before Chelsea came calling"]}
+,{id:15,player:"Michael Owen",nationality:"English",position:"Striker",clubs:[{name:"Liverpool",years:"1996–2004",league:"Premier League"},{name:"???",years:"2004–05",league:"La Liga"},{name:"Newcastle United",years:"2005–09",league:"Premier League"},{name:"Man United",years:"2009–12",league:"Premier League"},{name:"Stoke City",years:"2012–13",league:"Premier League"}],missingIndex:1,answer:"Real Madrid",acceptedAnswers:["real madrid","madrid"],hints:["La Liga, Spanish top flight","Spanish capital city","Signed by Florentino Perez — wore the number 11 shirt for one season"]}
+,{id:16,player:"James Rodriguez",nationality:"Colombian",position:"Attacking Midfielder",clubs:[{name:"Envigado",years:"2007–08",league:"Colombian Primera"},{name:"Banfield",years:"2008–10",league:"Argentine Primera"},{name:"Porto",years:"2010–13",league:"Primeira Liga"},{name:"Monaco",years:"2013–14",league:"Ligue 1"},{name:"Real Madrid",years:"2014–20",league:"La Liga"},{name:"???",years:"2015–17",league:"Bundesliga"},{name:"Everton",years:"2020–21",league:"Premier League"},{name:"Al-Rayyan",years:"2021–22",league:"Qatar Stars"}],missingIndex:5,answer:"Bayern Munich",acceptedAnswers:["bayern munich","bayern","fc bayern"],hints:["Bundesliga, German top flight","Munich, Bavaria","On loan from Real Madrid — won the Bundesliga in both seasons"]}
+,{id:17,player:"Arjen Robben",nationality:"Dutch",position:"Winger",clubs:[{name:"Groningen",years:"2000–02",league:"Eredivisie"},{name:"PSV",years:"2002–04",league:"Eredivisie"},{name:"Chelsea",years:"2004–07",league:"Premier League"},{name:"???",years:"2007–09",league:"La Liga"},{name:"Bayern Munich",years:"2009–19",league:"Bundesliga"},{name:"Groningen",years:"2020–21",league:"Eredivisie"}],missingIndex:3,answer:"Real Madrid",acceptedAnswers:["real madrid","madrid"],hints:["La Liga, Spanish top flight","Spanish capital city","Two seasons at the Bernabeu before moving to Bayern permanently"]}
+,{id:18,player:"Paul Pogba",nationality:"French",position:"Midfielder",clubs:[{name:"Man United",years:"2009–12",league:"Premier League"},{name:"Juventus",years:"2012–16",league:"Serie A"},{name:"Man United",years:"2016–22",league:"Premier League"},{name:"???",years:"2022–24",league:"Serie A"},{name:"Al-Qadsiah",years:"2025–",league:"Saudi Pro League"}],missingIndex:3,answer:"Juventus",acceptedAnswers:["juventus","juve"],hints:["Serie A, Italian top flight","Turin, northern Italy","Returned on a free — the same club he left for a world record fee six years earlier"]}
+,{id:19,player:"Gianluigi Buffon",nationality:"Italian",position:"Goalkeeper",clubs:[{name:"Parma",years:"1995–2001",league:"Serie A"},{name:"Juventus",years:"2001–18",league:"Serie A"},{name:"???",years:"2018–19",league:"Ligue 1"},{name:"Juventus",years:"2019–21",league:"Serie A"},{name:"Parma",years:"2021–23",league:"Serie B"}],missingIndex:2,answer:"Paris Saint-Germain",acceptedAnswers:["paris saint-germain","psg","paris sg","paris saint germain"],hints:["Ligue 1, French top flight","Paris, France","Left Juventus on a free aged 40 — his only ever season outside Italy"]}
+,{id:20,player:"Kieran Trippier",nationality:"English",position:"Right Back",clubs:[{name:"Man City",years:"2007–12",league:"Premier League"},{name:"Burnley",years:"2011–15",league:"Championship"},{name:"Tottenham",years:"2015–19",league:"Premier League"},{name:"???",years:"2019–22",league:"La Liga"},{name:"Newcastle United",years:"2022–25",league:"Premier League"}],missingIndex:3,answer:"Atletico Madrid",acceptedAnswers:["atletico madrid","atletico","atletico madrid","atletico"],hints:["La Liga, Spanish top flight","Spanish capital city","Won La Liga there under Simeone in 2021"]}
+,{id:21,player:"Sadio Mane",nationality:"Senegalese",position:"Forward",clubs:[{name:"Generation Foot",years:"2009–11",league:"Senegal Premier"},{name:"Metz",years:"2011–12",league:"Ligue 2"},{name:"Red Bull Salzburg",years:"2012–14",league:"Austrian Bundesliga"},{name:"???",years:"2014–16",league:"Premier League"},{name:"Liverpool",years:"2016–22",league:"Premier League"},{name:"Bayern Munich",years:"2022–23",league:"Bundesliga"},{name:"Al-Nassr",years:"2023–",league:"Saudi Pro League"}],missingIndex:3,answer:"Southampton",acceptedAnswers:["southampton","saints"],hints:["Premier League, English top flight","South coast of England","25 goals in 67 games — his form earned him a move to Liverpool"]}
+,{id:22,player:"Luis Suarez",nationality:"Uruguayan",position:"Striker",clubs:[{name:"Nacional",years:"2005–06",league:"Uruguayan Primera"},{name:"Groningen",years:"2006–07",league:"Eredivisie"},{name:"Ajax",years:"2007–11",league:"Eredivisie"},{name:"Liverpool",years:"2011–14",league:"Premier League"},{name:"Barcelona",years:"2014–20",league:"La Liga"},{name:"???",years:"2020–21",league:"La Liga"},{name:"Nacional",years:"2022",league:"Uruguayan Primera"},{name:"Gremio",years:"2022–23",league:"Serie A"},{name:"Inter Miami",years:"2024",league:"MLS"}],missingIndex:5,answer:"Atletico Madrid",acceptedAnswers:["atletico madrid","atletico"],hints:["La Liga, Spanish top flight","Spanish capital city","Barca released him — he scored the title-winning goal on the final day"]}
+,{id:23,player:"Matthijs de Ligt",nationality:"Dutch",position:"Centre Back",clubs:[{name:"Ajax",years:"2016–19",league:"Eredivisie"},{name:"Juventus",years:"2019–22",league:"Serie A"},{name:"???",years:"2022–24",league:"Bundesliga"},{name:"Man United",years:"2024–",league:"Premier League"}],missingIndex:2,answer:"Bayern Munich",acceptedAnswers:["bayern munich","bayern","fc bayern","fc bayern munich"],hints:["Bundesliga, German top flight","Munich, Bavaria","Signed for 67m euros — the most expensive defender in Bundesliga history at the time"]}
+,{id:24,player:"Zlatan Ibrahimovic",nationality:"Swedish",position:"Striker",clubs:[{name:"Malmö FF",years:"1999–2001",league:"Allsvenskan"},{name:"Ajax",years:"2001–04",league:"Eredivisie"},{name:"Juventus",years:"2004–06",league:"Serie A"},{name:"Inter Milan",years:"2006–09",league:"Serie A"},{name:"???",years:"2009–10",league:"La Liga"},{name:"AC Milan",years:"2010–12",league:"Serie A"},{name:"Paris Saint-Germain",years:"2012–16",league:"Ligue 1"},{name:"Man United",years:"2016–18",league:"Premier League"},{name:"LA Galaxy",years:"2018–19",league:"MLS"},{name:"AC Milan",years:"2019–21",league:"Serie A"}],missingIndex:4,answer:"Barcelona",acceptedAnswers:["barcelona","fc barcelona","barca"],hints:["La Liga, Spanish top flight","Catalonia, Spain","He later said it was his worst career move — famously clashed with Pep Guardiola"]}
+,{id:25,player:"Fernando Torres",nationality:"Spanish",position:"Striker",clubs:[{name:"Atletico Madrid",years:"1999–2007",league:"La Liga"},{name:"Liverpool",years:"2007–11",league:"Premier League"},{name:"Chelsea",years:"2011–14",league:"Premier League"},{name:"???",years:"2014–15",league:"Serie A"},{name:"Atletico Madrid",years:"2015–18",league:"La Liga"},{name:"Sagan Tosu",years:"2018",league:"J1 League"},{name:"Atletico Madrid",years:"2018",league:"La Liga"}],missingIndex:3,answer:"AC Milan",acceptedAnswers:["ac milan","milan","a.c. milan"],hints:["Serie A, Italian top flight","Northern Italy","A loan deal — he struggled for form and returned to Chelsea after just one season"]}
+,{id:26,player:"David Beckham",nationality:"English",position:"Midfielder",clubs:[{name:"Man United",years:"1992–2003",league:"Premier League"},{name:"Real Madrid",years:"2003–07",league:"La Liga"},{name:"LA Galaxy",years:"2007–12",league:"MLS"},{name:"AC Milan",years:"2009 (loan)",league:"Serie A"},{name:"AC Milan",years:"2010 (loan)",league:"Serie A"},{name:"???",years:"2013",league:"Ligue 1"},{name:"LA Galaxy",years:"2013",league:"MLS"}],missingIndex:5,answer:"Paris Saint-Germain",acceptedAnswers:["paris saint-germain","psg","paris sg","paris saint germain"],hints:["Ligue 1, French top flight","The French capital","A short 5-month contract — he donated his entire salary to a children's charity"]}
+,{id:27,player:"Thierry Henry",nationality:"French",position:"Forward",clubs:[{name:"Monaco",years:"1994–99",league:"Ligue 1"},{name:"???",years:"1999–2000",league:"Serie A"},{name:"Arsenal",years:"2000–07",league:"Premier League"},{name:"Barcelona",years:"2007–10",league:"La Liga"},{name:"New York Red Bulls",years:"2010–14",league:"MLS"},{name:"Arsenal",years:"2012 (loan)",league:"Premier League"}],missingIndex:1,answer:"Juventus",acceptedAnswers:["juventus","juve"],hints:["Serie A, Italian top flight","Turin, northern Italy","Just one season — he barely played and Wenger brought him to Arsenal straight after"]}
+,{id:28,player:"Ronaldinho",nationality:"Brazilian",position:"Attacking Midfielder",clubs:[{name:"Grêmio",years:"1998–2001",league:"Serie A"},{name:"Paris Saint-Germain",years:"2001–03",league:"Ligue 1"},{name:"Barcelona",years:"2003–08",league:"La Liga"},{name:"AC Milan",years:"2008–11",league:"Serie A"},{name:"???",years:"2011–12",league:"Serie A"},{name:"Atletico Mineiro",years:"2012–14",league:"Serie A"},{name:"Querétaro",years:"2014–15",league:"Liga MX"},{name:"Fluminense",years:"2015",league:"Serie A"},{name:"Chapecoense",years:"2015–16",league:"Serie A"}],missingIndex:4,answer:"Flamengo",acceptedAnswers:["flamengo","cr flamengo"],hints:["Brazilian football, Serie A Brazil","Rio de Janeiro","His first club back in Brazil after Europe — a homecoming of sorts"]}
+,{id:29,player:"Luka Modric",nationality:"Croatian",position:"Midfielder",clubs:[{name:"Dinamo Zagreb",years:"2002–08",league:"HNL"},{name:"Zrinjski",years:"2003–04 (loan)",league:"Bosnian Premier League"},{name:"Inter Zapresic",years:"2004–05 (loan)",league:"HNL"},{name:"Hajduk Split",years:"2005–06 (loan)",league:"HNL"},{name:"???",years:"2008–12",league:"Premier League"},{name:"Real Madrid",years:"2012–",league:"La Liga"}],missingIndex:4,answer:"Tottenham",acceptedAnswers:["tottenham","tottenham hotspur","spurs"],hints:["Premier League, English top flight","North London","Spent 4 seasons there — Harry Redknapp called him the best player he ever managed"]}
+,{id:30,player:"Andres Iniesta",nationality:"Spanish",position:"Midfielder",clubs:[{name:"Barcelona",years:"1996–2018",league:"La Liga"},{name:"???",years:"2018–23",league:"J1 League"},{name:"Emirates Club",years:"2023–24",league:"UAE Pro League"}],missingIndex:1,answer:"Vissel Kobe",acceptedAnswers:["vissel kobe","kobe"],hints:["J1 League, Japanese top flight","Kobe, Japan","He spent 5 years there — became a legend and helped grow football in Japan"]}
+];
+let state={puzzleIndex:0,attempts:0,maxAttempts:3,solved:false,failed:false,hintsUsed:[]};
+function loadStorage(){try{const r=localStorage.getItem('missingclub_v1');return r?JSON.parse(r):{stats:defaultStats(),sessions:{}};}catch{return{stats:defaultStats(),sessions:{}};}}
+function saveStorage(d){try{localStorage.setItem('missingclub_v1',JSON.stringify(d));}catch{}}
+function defaultStats(){return{played:0,wins:0,streak:0,bestStreak:0,dist:{1:0,2:0,3:0,miss:0}};}
+let storage=loadStorage();
+function getDailyPuzzleIndex(){const start=new Date("2025-01-01");const dayNum=Math.floor((new Date()-start)/86400000);return dayNum%PUZZLES.length;}
+function normalise(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s]/g,"").trim();}
+function checkGuess(guess,puzzle){const g=normalise(guess);return puzzle.acceptedAnswers.some(a=>normalise(a)===g);}
+document.addEventListener('DOMContentLoaded',()=>{state.puzzleIndex=getDailyPuzzleIndex();loadPuzzle(state.puzzleIndex);renderArchive();renderStats();document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitGuess();});});
+function loadPuzzle(idx){
+  const puzzle=PUZZLES[idx];state.puzzleIndex=idx;state.attempts=0;state.solved=false;state.failed=false;state.hintsUsed=[];
+  document.getElementById('puzzle-badge').textContent='PUZZLE #'+puzzle.id;
+  document.getElementById('puzzle-title').textContent=puzzle.player;
+  document.getElementById('puzzle-sub').textContent=puzzle.nationality+' · '+puzzle.position+' · Guess the missing club';
+  renderTimeline(puzzle,false);resetPips();
+  document.getElementById('result-banner').innerHTML='';document.getElementById('hint-reveal').innerHTML='';
+  document.getElementById('post-game-btns').style.display='none';document.getElementById('guess-section').style.display='block';document.getElementById('guess-input').value='';
+  [0,1,2].forEach(i=>{const b=document.getElementById('hint-btn-'+i);if(b){b.classList.remove('used');b.disabled=false;}});
+  const saved=storage.sessions['p'+idx];
+  if(saved){state.attempts=saved.attempts;state.solved=saved.solved;state.failed=saved.failed;state.hintsUsed=saved.hintsUsed||[];state.hintsUsed.forEach(h=>markHintUsed(h));if(saved.hintTexts)document.getElementById('hint-reveal').innerHTML=saved.hintTexts;[0,1,2].forEach((pip,i)=>{const el=document.getElementById('pip-'+i);if(el&&saved.pips&&saved.pips[i])el.classList.add(saved.pips[i]);});if(state.solved||state.failed)showEndState(state.solved,puzzle);renderTimeline(puzzle,state.solved||state.failed);}
+}
+function renderTimeline(puzzle,reveal){
+  const tl=document.getElementById('timeline');tl.innerHTML='';
+  puzzle.clubs.forEach((club,i)=>{
+    const isMissing=(i===puzzle.missingIndex);const row=document.createElement('div');row.className='club-row';
+    const num=document.createElement('div');num.className='club-num';num.textContent=i+1;
+    const dot=document.createElement('div');dot.className='club-dot '+(isMissing?'missing':'known');
+    const info=document.createElement('div');info.className='club-info';
+    if(isMissing&&!reveal){info.innerHTML='<div class="missing-slot">???</div>';}
+    else{const dn=isMissing&&reveal?'<span style="color:'+(state.solved?'var(--green)':'var(--red)')+'">'+puzzle.answer+'</span>':club.name;info.innerHTML='<div class="club-name">'+dn+'</div><div class="club-years">'+club.years+' · <span class="club-league">'+club.league+'</span></div>';}
+    row.appendChild(num);row.appendChild(dot);row.appendChild(info);tl.appendChild(row);
+  });
+}
+function submitGuess(){
+  if(state.solved||state.failed)return;const input=document.getElementById('guess-input');const val=input.value.trim();if(!val){input.focus();return;}
+  const puzzle=PUZZLES[state.puzzleIndex];const correct=checkGuess(val,puzzle);const pip=document.getElementById('pip-'+state.attempts);
+  if(correct){pip.classList.add('correct');state.solved=true;recordResult(true,state.attempts+1);showEndState(true,puzzle);renderTimeline(puzzle,true);}
+  else{pip.classList.add('wrong');state.attempts++;if(state.attempts>=state.maxAttempts){state.failed=true;recordResult(false,0);showEndState(false,puzzle);renderTimeline(puzzle,true);}}
+  input.value='';saveSession();
+}
+function showEndState(won,puzzle){
+  const banner=document.getElementById('result-banner');
+  if(won){banner.innerHTML='<div class="result-msg success">✓ Correct! The missing club was <strong>'+puzzle.answer+'</strong></div>';}
+  else{banner.innerHTML='<div class="result-msg fail">The missing club was <strong>'+puzzle.answer+'</strong></div>';}
+  document.getElementById('guess-section').querySelector('.guess-input-row').style.display='none';document.getElementById('post-game-btns').style.display='flex';
+}
+function revealHint(n){
+  if(state.solved||state.failed||state.hintsUsed.includes(n))return;const puzzle=PUZZLES[state.puzzleIndex];state.hintsUsed.push(n);markHintUsed(n);
+  const labels=['Country/League','City/Region','Clue'];const el=document.getElementById('hint-reveal');const sep=el.innerHTML?'<br>':'';
+  el.innerHTML=el.innerHTML+sep+'<strong>'+labels[n]+':</strong> '+puzzle.hints[n];saveSession({hintsUsed:state.hintsUsed,hintTexts:el.innerHTML});
+}
+function markHintUsed(n){const b=document.getElementById('hint-btn-'+n);if(b){b.classList.add('used');b.disabled=true;}}
+function resetPips(){[0,1,2].forEach(i=>{const p=document.getElementById('pip-'+i);if(p)p.className='pip';});}
+function getPipStates(){return[0,1,2].map(i=>{const p=document.getElementById('pip-'+i);if(p){if(p.classList.contains('correct'))return'correct';if(p.classList.contains('wrong'))return'wrong';}return null;});}
+function saveSession(extra){const key='p'+state.puzzleIndex;storage.sessions[key]=Object.assign(storage.sessions[key]||{},{attempts:state.attempts,solved:state.solved,failed:state.failed},extra);if(!extra?.pips)storage.sessions[key].pips=getPipStates();saveStorage(storage);}
+function recordResult(won,guessNum){const s=storage.stats;s.played++;if(won){s.wins++;s.streak++;if(s.streak>s.bestStreak)s.bestStreak=s.streak;s.dist[guessNum]=(s.dist[guessNum]||0)+1;}else{s.streak=0;s.dist.miss=(s.dist.miss||0)+1;}saveStorage(storage);}
+function renderStats(){const s=storage.stats;document.getElementById('stat-played').textContent=s.played;document.getElementById('stat-wins').textContent=s.wins;document.getElementById('stat-streak').textContent=s.streak;document.getElementById('stat-pct').textContent=s.played?Math.round(s.wins/s.played*100)+'%':'0%';const max=Math.max(1,s.dist[1]||0,s.dist[2]||0,s.dist[3]||0,s.dist.miss||0);['1','2','3','miss'].forEach(k=>{const v=s.dist[k]||0;const bar=document.getElementById('dist-'+k);const num=document.getElementById('dist-'+k+'-n');if(bar)bar.style.width=(v/max*100)+'%';if(num)num.textContent=v;});}
+function renderArchive(){const grid=document.getElementById('archive-grid');grid.innerHTML='';PUZZLES.forEach((puzzle,idx)=>{const card=document.createElement('div');card.className='archive-card';const sess=storage.sessions['p'+idx];const status=sess?.solved?'✓':sess?.failed?'✗':'';card.innerHTML='<div><div class="archive-card-player">'+(status?status+' ':'')+puzzle.player+'</div><div class="archive-card-sub">'+puzzle.nationality+' · '+puzzle.position+'</div></div><div class="archive-card-arrow">›</div>';card.addEventListener('click',()=>{loadPuzzle(idx);setView('game');});grid.appendChild(card);});}
+function shareResult(){const puzzle=PUZZLES[state.puzzleIndex];const squares=getPipStates().map(p=>p==='correct'?'🟩':p==='wrong'?'🟥':'⬜').join('');const outcome=state.solved?'Got it in '+(state.attempts+1)+'!':'Missed it — it was '+puzzle.answer;const text='⚽ Missing Club — Puzzle #'+(state.puzzleIndex+1)+'\n'+puzzle.player+'\n'+outcome+'\n'+squares+'\nnickt717.github.io/missing-club';if(navigator.clipboard){navigator.clipboard.writeText(text).then(showToast).catch(()=>fallbackCopy(text));}else fallbackCopy(text);}
+function fallbackCopy(text){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast();}
+function showToast(){const t=document.createElement('div');t.className='toast';t.textContent='Copied to clipboard!';document.body.appendChild(t);setTimeout(()=>t.remove(),2200);}
+function setView(view){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('view-'+view).classList.add('active');document.querySelector('[data-view="'+view+'"]').classList.add('active');if(view==='stats')renderStats();if(view==='archive')renderArchive();}
+</script>
+</body>
+</html>
