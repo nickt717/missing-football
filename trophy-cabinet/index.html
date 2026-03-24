@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Trophy Cabinet — Daily Football Puzzle</title>
+<meta name="description" content="Daily football puzzle — guess the player from their trophy cabinet. New puzzle every day.">
+<meta property="og:title" content="Trophy Cabinet — Daily Football Puzzle">
+<meta property="og:description" content="Can you identify the footballer from their trophy haul? A new puzzle every day.">
+<meta property="og:url" content="https://missingfootball.com/trophy-cabinet/">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green-pitch:#2d8c45;--green-dark:#1e6130;--white:#ffffff;--off-white:#f2f0eb;
+  --bg:#0f0f0f;--bg-card:#1a1a1a;--bg-elevated:#242424;
+  --border:rgba(255,255,255,0.08);--border-strong:rgba(255,255,255,0.18);
+  --text-primary:#f2f0eb;--text-muted:#888;--text-dim:#555;
+  --accent:#f5c518;--accent-dim:rgba(245,197,24,0.15);
+  --red:#e03c31;--green-result:#27ae60;
+  --radius:10px;--radius-sm:6px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;padding-bottom:3rem}
+.site-header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-inner{max-width:560px;margin:0 auto;padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;line-height:1;text-decoration:none;color:inherit}
+.logo-missing{color:var(--text-primary)}
+.logo-trophy{color:var(--accent)}
+.header-nav{display:flex;gap:.25rem}
+.nav-btn{background:none;border:none;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:.4rem .75rem;border-radius:var(--radius-sm);cursor:pointer;transition:.15s}
+.nav-btn:hover{color:var(--text-primary);background:var(--bg-elevated)}
+.nav-btn.active{color:var(--accent);background:var(--accent-dim)}
+.view{display:none;max-width:560px;margin:0 auto;padding:1.25rem}
+.view.active{display:block}
+.puzzle-meta{margin-bottom:1.25rem;text-align:center}
+.puzzle-badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);background:var(--bg-elevated);border:1px solid var(--border);border-radius:20px;padding:.3rem .8rem;margin-bottom:.6rem}
+.puzzle-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;color:var(--text-primary);margin-bottom:.25rem}
+.puzzle-sub{font-size:13px;color:var(--text-muted);line-height:1.5}
+.trophy-grid{display:grid;gap:.5rem;margin-bottom:1.25rem}
+.trophy-row{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;transition:.15s}
+.trophy-icon{font-size:22px;flex-shrink:0;width:32px;text-align:center}
+.trophy-info{flex:1;min-width:0}
+.trophy-name{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.3}
+.trophy-detail{font-size:12px;color:var(--text-muted);margin-top:.1rem}
+.trophy-count{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);flex-shrink:0;min-width:24px;text-align:right}
+.hints-section{margin-bottom:1rem}
+.hints-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.5rem}
+.hints-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.hint-btn{background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:.35rem .75rem;border-radius:20px;cursor:pointer;transition:.15s}
+.hint-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.hint-btn:disabled{opacity:.4;cursor:default}
+.hint-btn.used{background:var(--accent-dim);border-color:rgba(245,197,24,.3);color:var(--accent)}
+.hint-reveal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.6rem .9rem;font-size:13px;color:var(--text-muted);margin-top:.5rem;display:none}
+.hint-reveal.visible{display:block}
+.hint-reveal strong{color:var(--text-primary)}
+.guess-area{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1rem .75rem}
+.attempts-track{display:flex;gap:6px;justify-content:center;margin-bottom:.9rem}
+.pip{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--text-dim);background:transparent;transition:.2s}
+.pip.correct{background:var(--green-result);border-color:var(--green-result)}
+.pip.wrong{background:var(--red);border-color:var(--red)}
+.result-banner{margin-bottom:.75rem;border-radius:var(--radius-sm);overflow:hidden}
+.result-msg{padding:.7rem 1rem;font-size:14px;font-weight:500;text-align:center}
+.result-msg.success{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);color:#4ecf82}
+.result-msg.fail{background:rgba(224,60,49,.1);border:1px solid rgba(224,60,49,.25);color:#f07068}
+.input-row{display:flex;gap:.5rem}
+#guess-input{flex:1;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:14px;padding:.6rem .9rem;outline:none;transition:.15s}
+#guess-input:focus{border-color:var(--accent)}
+#guess-input::placeholder{color:var(--text-dim)}
+#guess-btn{background:var(--accent);border:none;border-radius:var(--radius-sm);color:#000;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;padding:.6rem 1.25rem;cursor:pointer;transition:.15s;white-space:nowrap}
+#guess-btn:hover{background:#ffd700}
+#guess-btn:disabled{opacity:.4;cursor:default}
+.share-row{display:flex;justify-content:center;margin-top:.75rem}
+#share-btn{background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:.5rem 1.25rem;cursor:pointer;transition:.15s;display:none}
+#share-btn:hover{border-color:var(--accent);color:var(--accent)}
+#share-btn.visible{display:block}
+.autocomplete-wrap{position:relative}
+.autocomplete-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);z-index:50;max-height:180px;overflow-y:auto;display:none}
+.autocomplete-list.open{display:block}
+.autocomplete-item{padding:.55rem .9rem;font-size:13px;cursor:pointer;color:var(--text-primary);transition:.1s}
+.autocomplete-item:hover,.autocomplete-item.selected{background:var(--accent-dim);color:var(--accent)}
+.stats-section{padding:.5rem 0}
+.stats-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.04em;margin-bottom:1rem;text-align:center}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem}
+.stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem .5rem;text-align:center}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--accent);line-height:1}
+.stat-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-top:.2rem}
+.dist-title{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.6rem}
+.dist-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem}
+.dist-label{font-size:12px;color:var(--text-muted);width:28px;flex-shrink:0}
+.dist-bar-wrap{flex:1;background:var(--bg-elevated);border-radius:3px;height:18px;overflow:hidden}
+.dist-bar{background:var(--accent);height:100%;border-radius:3px;min-width:4px;transition:.4s}
+.dist-count{font-size:12px;color:var(--text-muted);width:20px;text-align:right;flex-shrink:0}
+.reset-btn{display:block;margin:1.25rem auto 0;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-dim);font-family:'Inter',sans-serif;font-size:12px;padding:.4rem .9rem;cursor:pointer;transition:.15s}
+.reset-btn:hover{border-color:var(--red);color:var(--red)}
+.archive-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.04em;margin-bottom:.3rem;text-align:center}
+.archive-sub{font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:1rem}
+.archive-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.7rem 1rem;margin-bottom:.4rem;cursor:pointer;text-decoration:none;color:inherit;transition:.15s}
+.archive-item:hover{border-color:var(--border-strong);background:var(--bg-elevated)}
+.archive-puzzle-num{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+.archive-player{font-size:14px;font-weight:600;color:var(--text-primary);margin-top:.1rem}
+.archive-hint{font-size:12px;color:var(--text-muted);margin-top:.1rem}
+.archive-arrow{color:var(--text-dim);font-size:16px}
+.archive-item.solved .archive-player{color:var(--green-result)}
+.archive-item.failed .archive-player{color:var(--red)}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(0);background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--text-primary);font-size:13px;font-weight:500;padding:.6rem 1.25rem;border-radius:24px;box-shadow:0 4px 24px rgba(0,0,0,.4);z-index:999;animation:toast-in .25s ease,toast-out .25s ease 1.8s forwards}
+@keyframes toast-in{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes toast-out{from{opacity:1}to{opacity:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}60%{transform:translateX(4px)}}
+@media(max-width:400px){.stats-grid{grid-template-columns:repeat(2,1fr)}.puzzle-title{font-size:22px}}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="/"><span class="logo-missing">TROPHY</span><span class="logo-trophy"> CABINET</span></a>
+    <nav class="header-nav">
+      <button class="nav-btn active" data-view="game" onclick="setView('game')">Today</button>
+      <button class="nav-btn" data-view="archive" onclick="setView('archive')">Archive</button>
+      <button class="nav-btn" data-view="stats" onclick="setView('stats')">Stats</button>
+    </nav>
+  </div>
+</header>
+<main id="view-game" class="view active">
+  <div class="puzzle-meta">
+    <div class="puzzle-badge" id="puzzle-badge">Puzzle #1</div>
+    <h1 class="puzzle-title" id="puzzle-title">Whose Trophy Cabinet?</h1>
+    <p class="puzzle-sub" id="puzzle-sub">Identify the footballer from their trophy haul</p>
+  </div>
+  <div class="trophy-grid" id="trophy-grid"></div>
+  <div class="hints-section">
+    <div class="hints-label">Hints</div>
+    <div class="hints-row">
+      <button class="hint-btn" id="hint-1-btn" onclick="showHint(1)">Hint 1</button>
+      <button class="hint-btn" id="hint-2-btn" onclick="showHint(2)">Hint 2</button>
+      <button class="hint-btn" id="hint-3-btn" onclick="showHint(3)">Hint 3</button>
+    </div>
+    <div class="hint-reveal" id="hint-reveal"></div>
+  </div>
+  <div class="guess-area">
+    <div class="attempts-track" id="attempts-track"></div>
+    <div class="result-banner" id="result-banner"></div>
+    <div class="autocomplete-wrap">
+      <div class="input-row">
+        <input id="guess-input" type="text" placeholder="Enter player name…" autocomplete="off" oninput="onInput()" onkeydown="onKeyDown(event)"/>
+        <button id="guess-btn" onclick="submitGuess()">Guess</button>
+      </div>
+      <div class="autocomplete-list" id="autocomplete-list"></div>
+    </div>
+  </div>
+  <div class="share-row">
+    <button id="share-btn" onclick="shareResult()">Share 📋</button>
+  </div>
+</main>
+<div id="view-archive" class="view">
+  <h2 class="archive-title">Archive</h2>
+  <p class="archive-sub">All available puzzles — play any cabinet</p>
+  <div id="archive-list"></div>
+</div>
+<div id="view-stats" class="view">
+  <div class="stats-section">
+    <h2 class="stats-title">Your Stats</h2>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-num" id="stat-played">0</div><div class="stat-label">Played</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-won">0</div><div class="stat-label">Won</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+      <div class="stat-box"><div class="stat-num" id="stat-pct">0%</div><div class="stat-label">Win %</div></div>
+    </div>
+    <div class="dist-title">Guess Distribution</div>
+    <div class="dist-row"><div class="dist-label">1st</div><div class="dist-bar-wrap"><div class="dist-bar" id="bar-1" style="width:0%"></div></div><div class="dist-count" id="cnt-1">0</div></div>
+    <div class="dist-row"><div class="dist-label">2nd</div><div class="dist-bar-wrap"><div class="dist-bar" id="bar-2" style="width:0%"></div></div><div class="dist-count" id="cnt-2">0</div></div>
+    <div class="dist-row"><div class="dist-label">3rd</div><div class="dist-bar-wrap"><div class="dist-bar" id="bar-3" style="width:0%"></div></div><div class="dist-count" id="cnt-3">0</div></div>
+    <div class="dist-row"><div class="dist-label">Miss</div><div class="dist-bar-wrap"><div class="dist-bar" id="bar-miss" style="width:0%"></div></div><div class="dist-count" id="cnt-miss">0</div></div>
+    <button class="reset-btn" onclick="resetStats()">Reset Stats</button>
+  </div>
+</div>
+<script>
+const PUZZLES = [
+  {
+    id: 1,
+    player: "Sadio Mané",
+    nationality: "Senegalese",
+    position: "Left Winger",
+    acceptedAnswers: ["sadio mane", "sadio mané", "mane", "mané"],
+    trophies: [
+      { icon: "🏆", name: "UEFA Champions League", detail: "2018–19 with Liverpool", count: 1 },
+      { icon: "🇬🇧", name: "Premier League", detail: "2019–20 with Liverpool", count: 1 },
+      { icon: "🌍", name: "FIFA Club World Cup", detail: "2019 with Liverpool", count: 1 },
+      { icon: "⭐", name: "UEFA Super Cup", detail: "2019 with Liverpool", count: 1 },
+      { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "2021–22 with Liverpool", count: 1 },
+      { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2021–22 with Liverpool", count: 1 },
+      { icon: "🇦🇹", name: "Austrian Bundesliga", detail: "2013–14 with RB Salzburg", count: 1 },
+      { icon: "🌍", name: "Africa Cup of Nations", detail: "2021 with Senegal", count: 1 },
+      { icon: "🇩🇪", name: "Bundesliga", detail: "2022–23 with Bayern Munich", count: 1 }
+    ],
+    hints: [
+      "Nationality: Senegalese — won the Africa Cup of Nations in 2022",
+      "Club: Won the Premier League and Champions League with the same English club",
+      "Era: Scored the Premier League's fastest-ever hat-trick (176 seconds) at a previous club"
+    ]
+  },
+  {
+    id: 2,
+    player: "Harry Kane",
+    nationality: "English",
+    position: "Striker",
+    acceptedAnswers: ["harry kane", "kane"],
+    trophies: [
+      { icon: "🇩🇪", name: "Bundesliga", detail: "2024–25 with Bayern Munich", count: 1 },
+      { icon: "🇩🇪", name: "DFL-Supercup", detail: "2025 with Bayern Munich", count: 1 },
+      { icon: "⚽", name: "World Cup Golden Boot", detail: "2018 — 6 goals in Russia", count: 1 },
+      { icon: "👟", name: "Premier League Golden Boot", detail: "2020–21 & 2022–23", count: 2 },
+      { icon: "🥇", name: "European Golden Shoe", detail: "2023–24", count: 1 },
+      { icon: "🇩🇪", name: "Torjägerkanone", detail: "Bundesliga top scorer 2023–24 & 2024–25", count: 2 },
+      { icon: "🏆", name: "UEFA Champions League Final", detail: "Runner-up 2018–19 with Spurs", count: "🥈" },
+      { icon: "🌍", name: "UEFA Euro 2020 Final", detail: "Runner-up — England lost on penalties", count: "🥈" }
+    ],
+    hints: [
+      "Nationality: English — captain of the national team",
+      "Club: Spent the majority of his career at a North London club without winning a trophy there",
+      "Era: Waited until 2025 to win his first major club honour — in Germany"
+    ]
+  },
+  {
+    id: 3,
+    player: "Xavi",
+    nationality: "Spanish",
+    position: "Central Midfielder",
+    acceptedAnswers: ["xavi", "xavi hernandez", "xavi hernández", "xavier hernandez"],
+    trophies: [
+      { icon: "🏆", name: "UEFA Champions League", detail: "2006, 2009, 2011, 2015", count: 4 },
+      { icon: "🇪🇸", name: "La Liga", detail: "1999, 2005, 2006, 2009, 2010, 2011, 2013, 2015", count: 8 },
+      { icon: "🌍", name: "FIFA World Cup", detail: "2010 with Spain", count: 1 },
+      { icon: "🌍", name: "UEFA European Championship", detail: "2008 & 2012 with Spain", count: 2 },
+      { icon: "🌍", name: "FIFA Club World Cup", detail: "2009, 2011 with Barcelona", count: 2 },
+      { icon: "⭐", name: "UEFA Super Cup", detail: "2009, 2011 with Barcelona", count: 2 },
+      { icon: "🇪🇸", name: "Copa del Rey", detail: "2009, 2012, 2015 with Barcelona", count: 3 },
+      { icon: "🌍", name: "FIFA U-20 World Cup", detail: "1999 with Spain", count: 1 }
+    ],
+    hints: [
+      "Nationality: Spanish — won the World Cup, Euro 2008 and Euro 2012",
+      "Club: Spent almost his entire career at one Spanish club — 767 official appearances",
+      "Era: Named Player of the Tournament at UEFA Euro 2008 — the golden generation"
+    ]
+  }
+];
+const MAX_ATTEMPTS = 3;
+const EPOCH = new Date('2025-01-01');
+const dayNum = Math.floor((Date.now() - EPOCH.getTime()) / 86400000);
+const puzzleIndex = dayNum % PUZZLES.length;
+const puzzle = PUZZLES[puzzleIndex];
+const STORAGE_KEY = 'tc-game-' + puzzleIndex;
+const STATS_KEY = 'tc-stats';
+let state = { attempts: 0, solved: false, failed: false, hintsUsed: 0, guesses: [] };
+let statsData = { played: 0, won: 0, streak: 0, dist: { 1: 0, 2: 0, 3: 0, miss: 0 } };
+function init() {
+  loadStats();
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) state = JSON.parse(saved);
+  renderPuzzle();
+  renderPips();
+  renderTrophies();
+  restoreHints();
+  restoreBanner();
+  renderArchive();
+  renderStats();
+  if (state.solved || state.failed) {
+    lockInput();
+    document.getElementById('share-btn').classList.add('visible');
+  }
+}
+function renderPuzzle() {
+  document.getElementById('puzzle-badge').textContent = 'Puzzle #' + puzzle.id;
+  document.getElementById('puzzle-title').textContent = 'Whose Trophy Cabinet?';
+  document.getElementById('puzzle-sub').textContent = 'Identify the footballer from their trophy haul — ' + puzzle.trophies.length + ' honours on display';
+}
+function renderTrophies() {
+  const grid = document.getElementById('trophy-grid');
+  grid.innerHTML = '';
+  puzzle.trophies.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'trophy-row';
+    const countDisplay = typeof t.count === 'number' ? '×' + t.count : t.count;
+    row.innerHTML = '<div class="trophy-icon">' + t.icon + '</div><div class="trophy-info"><div class="trophy-name">' + t.name + '</div><div class="trophy-detail">' + t.detail + '</div></div><div class="trophy-count">' + countDisplay + '</div>';
+    grid.appendChild(row);
+  });
+}
+function renderPips() {
+  const track = document.getElementById('attempts-track');
+  track.innerHTML = '';
+  for (let i = 0; i < MAX_ATTEMPTS; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'pip';
+    pip.id = 'pip-' + i;
+    if (i < state.guesses.length) pip.classList.add(state.guesses[i].correct ? 'correct' : 'wrong');
+    track.appendChild(pip);
+  }
+}
+function restoreHints() {
+  for (let i = 1; i <= state.hintsUsed; i++) {
+    const btn = document.getElementById('hint-' + i + '-btn');
+    if (btn) { btn.classList.add('used'); btn.disabled = true; }
+  }
+  if (state.hintsUsed > 0) {
+    const reveal = document.getElementById('hint-reveal');
+    reveal.innerHTML = '<strong>Hint ' + state.hintsUsed + ':</strong> ' + puzzle.hints[state.hintsUsed - 1];
+    reveal.classList.add('visible');
+  }
+}
+function restoreBanner() {
+  if (state.solved) {
+    showBanner('✓ Correct! It was <strong>' + puzzle.player + '</strong>', 'success');
+  } else if (state.failed) {
+    showBanner('The answer was <strong>' + puzzle.player + '</strong>', 'fail');
+  } else if (state.guesses.length > 0) {
+    const remaining = MAX_ATTEMPTS - state.attempts;
+    showBanner('✗ Not quite — ' + remaining + ' attempt' + (remaining === 1 ? '' : 's') + ' left', 'fail');
+  }
+}
+function showHint(n) {
+  if (state.solved || state.failed) return;
+  if (n > state.hintsUsed + 1 || n <= state.hintsUsed) return;
+  state.hintsUsed = n;
+  saveState();
+  for (let i = 1; i <= n; i++) {
+    const btn = document.getElementById('hint-' + i + '-btn');
+    if (btn) { btn.classList.add('used'); btn.disabled = true; }
+  }
+  const reveal = document.getElementById('hint-reveal');
+  reveal.innerHTML = '<strong>Hint ' + n + ':</strong> ' + puzzle.hints[n - 1];
+  reveal.classList.add('visible');
+}
+const ALL_NAMES = [...new Set(PUZZLES.map(p => p.player))];
+let acIndex = -1;
+function onInput() {
+  const val = document.getElementById('guess-input').value.trim();
+  const list = document.getElementById('autocomplete-list');
+  acIndex = -1;
+  if (val.length < 2) { list.classList.remove('open'); list.innerHTML = ''; return; }
+  const matches = ALL_NAMES.filter(n => n.toLowerCase().includes(val.toLowerCase())).slice(0, 6);
+  if (!matches.length) { list.classList.remove('open'); return; }
+  list.innerHTML = matches.map(m => '<div class="autocomplete-item" onclick="selectAC(\'' + m + '\')">' + m + '</div>').join('');
+  list.classList.add('open');
+}
+function selectAC(name) {
+  document.getElementById('guess-input').value = name;
+  document.getElementById('autocomplete-list').classList.remove('open');
+  document.getElementById('autocomplete-list').innerHTML = '';
+  acIndex = -1;
+}
+function onKeyDown(e) {
+  const list = document.getElementById('autocomplete-list');
+  const items = list.querySelectorAll('.autocomplete-item');
+  if (e.key === 'ArrowDown') { e.preventDefault(); acIndex = Math.min(acIndex + 1, items.length - 1); items.forEach((el, i) => el.classList.toggle('selected', i === acIndex)); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); acIndex = Math.max(acIndex - 1, -1); items.forEach((el, i) => el.classList.toggle('selected', i === acIndex)); }
+  else if (e.key === 'Enter') { if (acIndex >= 0 && items[acIndex]) { selectAC(items[acIndex].textContent); } else { submitGuess(); } }
+  else if (e.key === 'Escape') { list.classList.remove('open'); }
+}
+document.addEventListener('click', e => { if (!e.target.closest('.autocomplete-wrap')) document.getElementById('autocomplete-list').classList.remove('open'); });
+function submitGuess() {
+  if (state.solved || state.failed) return;
+  const input = document.getElementById('guess-input');
+  const raw = input.value.trim();
+  if (!raw) { shakeInput(); return; }
+  document.getElementById('autocomplete-list').classList.remove('open');
+  const guess = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const correct = puzzle.acceptedAnswers.some(a => a.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') === guess);
+  const pip = document.getElementById('pip-' + state.attempts);
+  state.attempts++;
+  state.guesses.push({ guess: raw, correct });
+  if (pip) pip.classList.add(correct ? 'correct' : 'wrong');
+  input.value = '';
+  if (correct) {
+    state.solved = true;
+    showBanner('✓ Correct! It was <strong>' + puzzle.player + '</strong>', 'success');
+    lockInput();
+    document.getElementById('share-btn').classList.add('visible');
+    recordResult(true);
+  } else if (state.attempts >= MAX_ATTEMPTS) {
+    state.failed = true;
+    showBanner('The answer was <strong>' + puzzle.player + '</strong>', 'fail');
+    lockInput();
+    document.getElementById('share-btn').classList.add('visible');
+    recordResult(false);
+  } else {
+    const remaining = MAX_ATTEMPTS - state.attempts;
+    showBanner('✗ Not quite — ' + remaining + ' attempt' + (remaining === 1 ? '' : 's') + ' left', 'fail');
+  }
+  saveState();
+}
+function shakeInput() {
+  const input = document.getElementById('guess-input');
+  input.style.animation = 'shake .3s ease';
+  setTimeout(() => input.style.animation = '', 300);
+}
+function showBanner(html, type) {
+  const banner = document.getElementById('result-banner');
+  banner.innerHTML = '<div class="result-msg ' + type + '">' + html + '</div>';
+}
+function lockInput() {
+  document.getElementById('guess-input').disabled = true;
+  document.getElementById('guess-btn').disabled = true;
+}
+function recordResult(won) {
+  loadStats();
+  statsData.played++;
+  if (won) { statsData.won++; statsData.streak++; statsData.dist[state.attempts]++; }
+  else { statsData.streak = 0; statsData.dist.miss++; }
+  saveStats();
+  renderStats();
+}
+function loadStats() {
+  const s = localStorage.getItem(STATS_KEY);
+  if (s) statsData = JSON.parse(s);
+}
+function saveStats() { localStorage.setItem(STATS_KEY, JSON.stringify(statsData)); }
+function renderStats() {
+  document.getElementById('stat-played').textContent = statsData.played;
+  document.getElementById('stat-won').textContent = statsData.won;
+  document.getElementById('stat-streak').textContent = statsData.streak;
+  document.getElementById('stat-pct').textContent = statsData.played ? Math.round((statsData.won / statsData.played) * 100) + '%' : '0%';
+  const max = Math.max(1, ...Object.values(statsData.dist));
+  [1, 2, 3, 'miss'].forEach(k => {
+    const v = statsData.dist[k] || 0;
+    document.getElementById('bar-' + k).style.width = Math.round((v / max) * 100) + '%';
+    document.getElementById('cnt-' + k).textContent = v;
+  });
+}
+function resetStats() {
+  if (!confirm('Reset all stats?')) return;
+  statsData = { played: 0, won: 0, streak: 0, dist: { 1: 0, 2: 0, 3: 0, miss: 0 } };
+  saveStats();
+  renderStats();
+}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function shareResult() {
+  const icons = state.guesses.map(g => g.correct ? '🟩' : '🟥').join('');
+  const outcome = state.solved ? icons : icons + ' ❌';
+  const text = '🏆 Trophy Cabinet #' + puzzle.id + '\n' + outcome + '\nmissingfootball.com/trophy-cabinet';
+  if (navigator.share) { navigator.share({ text }).catch(() => copyToClipboard(text)); }
+  else { copyToClipboard(text); }
+}
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!')).catch(() => showToast('Share failed'));
+}
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+function renderArchive() {
+  const list = document.getElementById('archive-list');
+  list.innerHTML = '';
+  PUZZLES.forEach((p, i) => {
+    const saved = localStorage.getItem('tc-game-' + i);
+    const s = saved ? JSON.parse(saved) : null;
+    const statusClass = s ? (s.solved ? 'solved' : s.failed ? 'failed' : '') : '';
+    const a = document.createElement('a');
+    a.className = 'archive-item ' + statusClass;
+    a.href = '#';
+    a.innerHTML = '<div class="archive-item-left"><div class="archive-puzzle-num">Puzzle #' + p.id + '</div><div class="archive-player">' + p.trophies.length + ' trophies on display</div><div class="archive-hint">' + p.nationality + ' · ' + p.position + '</div></div><div class="archive-arrow">›</div>';
+    a.addEventListener('click', e => { e.preventDefault(); loadArchivePuzzle(i); });
+    list.appendChild(a);
+  });
+}
+function loadArchivePuzzle(index) {
+  const p = PUZZLES[index];
+  document.getElementById('puzzle-badge').textContent = 'Puzzle #' + p.id + ' (Archive)';
+  document.getElementById('puzzle-sub').textContent = p.nationality + ' · ' + p.position;
+  const grid = document.getElementById('trophy-grid');
+  grid.innerHTML = '';
+  p.trophies.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'trophy-row';
+    const countDisplay = typeof t.count === 'number' ? '×' + t.count : t.count;
+    row.innerHTML = '<div class="trophy-icon">' + t.icon + '</div><div class="trophy-info"><div class="trophy-name">' + t.name + '</div><div class="trophy-detail">' + t.detail + '</div></div><div class="trophy-count">' + countDisplay + '</div>';
+    grid.appendChild(row);
+  });
+  setView('game');
+  showToast('Archive: Puzzle #' + p.id);
+}
+function setView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  document.querySelector('[data-view="' + v + '"]').classList.add('active');
+  if (v === 'archive') renderArchive();
+  if (v === 'stats') renderStats();
+  if (v === 'game') { renderPuzzle(); renderTrophies(); renderPips(); }
+}
+init();
+</script>
+</body>
+</html>
