@@ -216,7 +216,7 @@ function submitGuess(){
   if(state.solved||state.failed)return;const input=document.getElementById('guess-input');const val=input.value.trim();if(!val){input.focus();return;}
   const puzzle=PUZZLES[state.puzzleIndex];const correct=checkGuess(val,puzzle);const pip=document.getElementById('pip-'+state.attempts);
   if(correct){pip.classList.add('correct');state.solved=true;recordResult(true,state.attempts+1);showEndState(true,puzzle);renderTimeline(puzzle,true);}
-  else{pip.classList.add('wrong');state.attempts++;if(state.attempts>=state.maxAttempts){state.failed=true;recordResult(false,0);showEndState(false,puzzle);renderTimeline(puzzle,true);}}
+  else{pip.classList.add('wrong');state.attempts++;if(state.attempts>=state.maxAttempts){state.failed=true;recordResult(false,0);showEndState(false,puzzle);renderTimeline(puzzle,true);}else{const banner=document.getElementById('result-banner');const remaining=state.maxAttempts-state.attempts;if(remaining>0){banner.innerHTML='<div class="result-msg fail">✗ Not quite — '+remaining+' attempt'+(remaining===1?'':'s')+' left</div>';}}}
   input.value='';saveSession();
 }
 function showEndState(won,puzzle){
