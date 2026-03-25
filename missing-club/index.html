@@ -210,6 +210,7 @@ const PUZZLES=[
 ,{id:60,player:"Emre Belözoğlu",nationality:"Turkish",position:"Midfielder",clubs:[{name:"Galatasaray",years:"1997–2000"},{name:"Inter Milan",years:"2000–2003"},{name:"Newcastle United",years:"2003–2005"},{name:"Fenerbahçe",years:"2005–2007"},{name:"Atlético Madrid",years:"2007–2008"},{name:"???",years:"2008–2009"},{name:"Fenerbahçe",years:"2009–2014"},{name:"Istanbul Başakşehir",years:"2015–2021"}],answer:"Newcastle United",acceptedAnswers:["newcastle united","newcastle","nufc","the magpies"],hints:["Country/League: English football, Premier League","Era: He returned to Newcastle on loan in 2008–09 for a second spell","Clue: Turkish international — his first Newcastle spell was 2003–05, this was a brief loan return"]}
 ];
 let state={puzzleIndex:0,attempts:0,maxAttempts:3,solved:false,failed:false,hintsUsed:[]};
+let puzzle;
 function loadStorage(){try{const r=localStorage.getItem('missingclub_v1');return r?JSON.parse(r):{stats:defaultStats(),sessions:{}};}catch{return{stats:defaultStats(),sessions:{}};}}
 function saveStorage(d){try{localStorage.setItem('missingclub_v1',JSON.stringify(d));}catch{}}
 function defaultStats(){return{played:0,wins:0,streak:0,bestStreak:0,dist:{1:0,2:0,3:0,miss:0}};}
@@ -219,7 +220,7 @@ function normalise(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\
 function checkGuess(guess,puzzle){const g=normalise(guess);return puzzle.acceptedAnswers.some(a=>normalise(a)===g);}
 document.addEventListener('DOMContentLoaded',()=>{state.puzzleIndex=getDailyPuzzleIndex();loadPuzzle(state.puzzleIndex);renderArchive();renderStats();document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitGuess();});});
 function loadPuzzle(idx){
-  const puzzle=PUZZLES[idx];state.puzzleIndex=idx;state.attempts=0;state.solved=false;state.failed=false;state.hintsUsed=[];
+  puzzle=PUZZLES[idx];state.puzzleIndex=idx;state.attempts=0;state.solved=false;state.failed=false;state.hintsUsed=[];
   document.getElementById('puzzle-badge').textContent='PUZZLE #'+puzzle.id;
   document.getElementById('puzzle-title').textContent=puzzle.player;
   document.getElementById('puzzle-sub').textContent=puzzle.nationality+' · '+puzzle.position+' · Guess the missing club';
@@ -233,12 +234,12 @@ function loadPuzzle(idx){
 function renderTimeline(puzzle,reveal){
   const tl=document.getElementById('timeline');tl.innerHTML='';
   puzzle.clubs.forEach((club,i)=>{
-    const isMissing=(i===puzzle.missingIndex);const row=document.createElement('div');row.className='club-row';
+    const isMissing=puzzle.missingIndex!==undefined?(i===puzzle.missingIndex):(club.name==='???');const row=document.createElement('div');row.className='club-row';
     const num=document.createElement('div');num.className='club-num';num.textContent=i+1;
     const dot=document.createElement('div');dot.className='club-dot '+(isMissing?'missing':'known');
     const info=document.createElement('div');info.className='club-info';
     if(isMissing&&!reveal){info.innerHTML='<div class="missing-slot">???</div>';}
-    else{const dn=isMissing&&reveal?'<span style="color:'+(state.solved?'var(--green)':'var(--red)')+'">'+puzzle.answer+'</span>':club.name;info.innerHTML='<div class="club-name">'+dn+'</div><div class="club-years">'+club.years+' · <span class="club-league">'+club.league+'</span></div>';}
+    else{const dn=isMissing&&reveal?'<span style="color:'+(state.solved?'var(--green)':'var(--red)')+'">'+puzzle.answer+'</span>':club.name;const leagueSpan=club.league?' · <span class="club-league">'+club.league+'</span>':'';info.innerHTML='<div class="club-name">'+dn+'</div><div class="club-years">'+club.years+leagueSpan+'</div>';}
     row.appendChild(num);row.appendChild(dot);row.appendChild(info);tl.appendChild(row);
   });
 }
@@ -287,7 +288,7 @@ function showShareOptions(text) {
   setTimeout(() => t.remove(), 3000);
 }
 function shareResult() {
-  const icons = state.guesses.map(g => g.correct ? '🟩' : '🟥').join('');
+  const icons = getPipStates().filter(p => p !== null).map(p => p === 'correct' ? '🟩' : '🟥').join('');
   const solved = state.solved;
   const line1 = '🏟️ Missing Club #' + puzzle.id;
   const line2 = solved
