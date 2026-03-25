@@ -777,15 +777,47 @@ function resetStats() {
   renderStats();
 }
 function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function showShareOptions(text) {
+  // Try native share first (mobile)
+  if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
+    navigator.share({ text }).catch(() => copyToClipboard(text));
+    return;
+  }
+  // On desktop: copy to clipboard + show WhatsApp button
+  copyToClipboard(text);
+  // Show a WhatsApp share option in the toast
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(text);
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.cssText = 'display:flex;align-items:center;gap:.75rem;';
+  t.innerHTML = '<span>Copied!</span><a href="' + waUrl + '" target="_blank" style="color:#25D366;font-weight:600;text-decoration:none;font-size:13px;">WhatsApp ↗</a>';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
 function shareResult() {
   const icons = state.guesses.map(g => g.correct ? '🟩' : '🟥').join('');
-  const outcome = state.solved ? icons : icons + ' ❌';
-  const text = '🏆 Trophy Cabinet #' + puzzle.id + '\n' + outcome + '\nmissingfootball.com/trophy-cabinet';
-  if (navigator.share) { navigator.share({ text }).catch(() => copyToClipboard(text)); }
-  else { copyToClipboard(text); }
+  const solved = state.solved;
+  const line1 = '🏆 Trophy Cabinet #' + puzzle.id;
+  const line2 = solved
+    ? icons + '  Solved in ' + state.attempts + '!'
+    : icons + '  Not today!';
+  const line3 = 'missingfootball.com/trophy-cabinet';
+  const text = line1 + '\n' + line2 + '\n' + line3;
+  showShareOptions(text);
 }
 function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!')).catch(() => showToast('Share failed'));
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
 }
 function showToast(msg) {
   const existing = document.querySelector('.toast');

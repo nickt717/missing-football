@@ -267,9 +267,48 @@ function saveSession(extra){const key='p'+state.puzzleIndex;storage.sessions[key
 function recordResult(won,guessNum){const s=storage.stats;s.played++;if(won){s.wins++;s.streak++;if(s.streak>s.bestStreak)s.bestStreak=s.streak;s.dist[guessNum]=(s.dist[guessNum]||0)+1;}else{s.streak=0;s.dist.miss=(s.dist.miss||0)+1;}saveStorage(storage);}
 function renderStats(){const s=storage.stats;document.getElementById('stat-played').textContent=s.played;document.getElementById('stat-wins').textContent=s.wins;document.getElementById('stat-streak').textContent=s.streak;document.getElementById('stat-pct').textContent=s.played?Math.round(s.wins/s.played*100)+'%':'0%';const max=Math.max(1,s.dist[1]||0,s.dist[2]||0,s.dist[3]||0,s.dist.miss||0);['1','2','3','miss'].forEach(k=>{const v=s.dist[k]||0;const bar=document.getElementById('dist-'+k);const num=document.getElementById('dist-'+k+'-n');if(bar)bar.style.width=(v/max*100)+'%';if(num)num.textContent=v;});}
 function renderArchive(){const grid=document.getElementById('archive-grid');grid.innerHTML='';PUZZLES.forEach((puzzle,idx)=>{const card=document.createElement('div');card.className='archive-card';const sess=storage.sessions['p'+idx];const status=sess?.solved?'✓':sess?.failed?'✗':'';card.innerHTML='<div><div class="archive-card-player">'+(status?status+' ':'')+puzzle.player+'</div><div class="archive-card-sub">'+puzzle.nationality+' · '+puzzle.position+'</div></div><div class="archive-card-arrow">›</div>';card.addEventListener('click',()=>{loadPuzzle(idx);setView('game');});grid.appendChild(card);});}
-function shareResult(){const puzzle=PUZZLES[state.puzzleIndex];const squares=getPipStates().map(p=>p==='correct'?'🟩':p==='wrong'?'🟥':'⬜').join('');const outcome=state.solved?'Got it in '+(state.attempts+1)+'!':'Missed it — it was '+puzzle.answer;const text='⚽ Missing Club — Puzzle #'+(state.puzzleIndex+1)+'\n'+puzzle.player+'\n'+outcome+'\n'+squares+'\nnickt717.github.io/missing-club';if(navigator.clipboard){navigator.clipboard.writeText(text).then(showToast).catch(()=>fallbackCopy(text));}else fallbackCopy(text);}
-function fallbackCopy(text){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast();}
-function showToast(){const t=document.createElement('div');t.className='toast';t.textContent='Copied to clipboard!';document.body.appendChild(t);setTimeout(()=>t.remove(),2200);}
+function showShareOptions(text) {
+  // Try native share first (mobile)
+  if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
+    navigator.share({ text }).catch(() => copyToClipboard(text));
+    return;
+  }
+  // On desktop: copy to clipboard + show WhatsApp button
+  copyToClipboard(text);
+  // Show a WhatsApp share option in the toast
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(text);
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.cssText = 'display:flex;align-items:center;gap:.75rem;';
+  t.innerHTML = '<span>Copied!</span><a href="' + waUrl + '" target="_blank" style="color:#25D366;font-weight:600;text-decoration:none;font-size:13px;">WhatsApp ↗</a>';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+function shareResult() {
+  const icons = state.guesses.map(g => g.correct ? '🟩' : '🟥').join('');
+  const solved = state.solved;
+  const line1 = '🏟️ Missing Club #' + puzzle.id;
+  const line2 = solved
+    ? icons + '  Solved in ' + state.attempts + '!'
+    : icons + '  Not today!';
+  const line3 = 'missingfootball.com/missing-club';
+  const text = line1 + '\n' + line2 + '\n' + line3;
+  showShareOptions(text);
+}
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+}
 function setView(view){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('view-'+view).classList.add('active');document.querySelector('[data-view="'+view+'"]').classList.add('active');if(view==='stats')renderStats();if(view==='archive')renderArchive();}
 </script>
 </body>
