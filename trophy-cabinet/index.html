@@ -838,7 +838,7 @@ function renderArchive() {
     const a = document.createElement('a');
     a.className = 'archive-item ' + statusClass;
     a.href = '#';
-    a.innerHTML = '<div class="archive-item-left"><div class="archive-puzzle-num">Puzzle #' + p.id + '</div><div class="archive-player">' + p.trophies.length + ' trophies on display</div><div class="archive-hint">' + p.nationality + ' · ' + p.position + '</div></div><div class="archive-arrow">›</div>';
+    a.innerHTML = '<div class="archive-item-left"><div class="archive-puzzle-num">Puzzle #' + p.id + '</div><div class="archive-player">' + p.trophies.length + ' trophies on display</div></div><div class="archive-arrow">›</div>';
     a.addEventListener('click', e => { e.preventDefault(); loadArchivePuzzle(i); });
     list.appendChild(a);
   });
