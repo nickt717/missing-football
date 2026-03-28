@@ -725,7 +725,7 @@ function renderPitch(idx,teamKey){
     const isWrong=isMissing&&state.failed;
     const dot=document.createElement('div');
     dot.className='player-dot'+(isMissing&&!state.solved&&!state.failed?' missing':'')+(isCorrect?' correct':'')+(isWrong?' wrong':'');
-    dot.style.left=p.pos[0]+'%';
+    dot.style.left=(100-p.pos[0])+'%';
     dot.style.top=p.pos[1]+'%';
     const shirt=document.createElement('div');
     shirt.className='shirt';
