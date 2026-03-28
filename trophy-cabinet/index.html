@@ -50,8 +50,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 .trophy-detail{font-size:12px;color:var(--text-muted);margin-top:.1rem}
 .trophy-count{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);flex-shrink:0;min-width:24px;text-align:right}
 .hints-section{margin-bottom:1rem}
-.hints-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.5rem}
-.hints-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.hint-row{margin-bottom:.5rem}
 .hint-btn{background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:.35rem .75rem;border-radius:20px;cursor:pointer;transition:.15s}
 .hint-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
 .hint-btn:disabled{opacity:.4;cursor:default}
@@ -135,11 +134,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
   </div>
   <div class="trophy-grid" id="trophy-grid"></div>
   <div class="hints-section">
-    <div class="hints-label">Hints</div>
-    <div class="hints-row">
-      <button class="hint-btn" id="hint-1-btn" onclick="showHint(1)">Hint 1</button>
-      <button class="hint-btn" id="hint-2-btn" onclick="showHint(2)">Hint 2</button>
-      <button class="hint-btn" id="hint-3-btn" onclick="showHint(3)">Hint 3</button>
+    <div class="hint-row">
+      <button class="hint-btn" id="hint-btn" onclick="showHint()" disabled>💡 Hint</button>
     </div>
     <div class="hint-reveal" id="hint-reveal"></div>
   </div>
@@ -198,13 +194,7 @@ const PUZZLES = [
       { icon: "🇦🇹", name: "Austrian Bundesliga", detail: "2013–14 with RB Salzburg", count: 1 },
       { icon: "🌍", name: "Africa Cup of Nations", detail: "2021 with Senegal", count: 1 },
       { icon: "🇩🇪", name: "Bundesliga", detail: "2022–23 with Bayern Munich", count: 1 }
-    ],
-    hints: [
-      "Nationality: Senegalese — won the Africa Cup of Nations in 2022",
-      "Club: Won the Premier League and Champions League with the same English club",
-      "Era: Scored the Premier League's fastest-ever hat-trick (176 seconds) at a previous club"
-    ]
-  },
+    ]  },
   {
     id: 2,
     player: "Harry Kane",
@@ -220,13 +210,7 @@ const PUZZLES = [
       { icon: "🇩🇪", name: "Torjägerkanone", detail: "Bundesliga top scorer 2023–24 & 2024–25", count: 2 },
       { icon: "🏆", name: "UEFA Champions League Final", detail: "Runner-up 2018–19 with Spurs", count: "🥈" },
       { icon: "🌍", name: "UEFA Euro 2020 Final", detail: "Runner-up — England lost on penalties", count: "🥈" }
-    ],
-    hints: [
-      "Nationality: English — captain of the national team",
-      "Club: Spent the majority of his career at a North London club without winning a trophy there",
-      "Era: Waited until 2025 to win his first major club honour — in Germany"
-    ]
-  },
+    ]  },
   {
     id: 3,
     player: "Xavi",
@@ -242,13 +226,7 @@ const PUZZLES = [
       { icon: "⭐", name: "UEFA Super Cup", detail: "2009, 2011 with Barcelona", count: 2 },
       { icon: "🇪🇸", name: "Copa del Rey", detail: "2009, 2012, 2015 with Barcelona", count: 3 },
       { icon: "🌍", name: "FIFA U-20 World Cup", detail: "1999 with Spain", count: 1 }
-    ],
-    hints: [
-      "Nationality: Spanish — won the World Cup, Euro 2008 and Euro 2012",
-      "Club: Spent almost his entire career at one Spanish club — 767 official appearances",
-      "Era: Named Player of the Tournament at UEFA Euro 2008 — the golden generation"
-    ]
-  },
+    ]  },
   {
     id: 4,
     player: "Javier Zanetti",
@@ -262,13 +240,7 @@ const PUZZLES = [
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2010 with Inter Milan", count: 1 },
       { icon: "⭐", name: "UEFA Cup", detail: "1997–98 with Inter Milan", count: 1 },
       { icon: "🇮🇹", name: "Italian Super Cup", detail: "4 times with Inter Milan", count: 4 }
-    ],
-    hints: [
-      "Nationality: Argentine — spent his entire club career at one Italian club",
-      "Club: Captain of Inter Milan for 13 years, retiring in 2014",
-      "Era: Key figure in Inter's historic 2009–10 Treble under José Mourinho"
-    ]
-  },
+    ]  },
   {
     id: 5,
     player: "Park Ji-sung",
@@ -282,13 +254,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "3 times with Manchester United", count: 3 },
       { icon: "🇳🇱", name: "Eredivisie", detail: "2 titles with PSV Eindhoven", count: 2 },
       { icon: "🇳🇱", name: "KNVB Cup", detail: "2004–05 with PSV Eindhoven", count: 1 }
-    ],
-    hints: [
-      "Nationality: South Korean — first Asian player to win the UEFA Champions League",
-      "Club: Won 4 Premier League titles and the Champions League at Old Trafford",
-      "Era: Nicknamed 'Three-Lung Park' for his extraordinary fitness levels under Sir Alex Ferguson"
-    ]
-  },
+    ]  },
   {
     id: 6,
     player: "Shinji Kagawa",
@@ -301,13 +267,7 @@ const PUZZLES = [
       { icon: "🇬🇧", name: "Premier League", detail: "2012–13 with Manchester United", count: 1 },
       { icon: "🇩🇪", name: "DFL-Supercup", detail: "2013, 2014 with Borussia Dortmund", count: 2 },
       { icon: "🇯🇵", name: "J.League Division 2", detail: "2008 with Cerezo Osaka", count: 1 }
-    ],
-    hints: [
-      "Nationality: Japanese — one of the most successful Asian players in European football",
-      "Club: Won back-to-back Bundesliga titles with a German club, then moved to England",
-      "Era: Became the first Asian player to score a Premier League hat-trick in 2012"
-    ]
-  },
+    ]  },
   {
     id: 7,
     player: "Dimitar Berbatov",
@@ -320,13 +280,7 @@ const PUZZLES = [
       { icon: "👟", name: "Premier League Golden Boot", detail: "2010–11 — 20 goals shared with Carlos Tevez", count: 1 },
       { icon: "🇧🇬", name: "Bulgarian Cup", detail: "1998–99 with CSKA Sofia", count: 1 },
       { icon: "🇩🇪", name: "DFB-Pokal", detail: "2003–04 with Bayer Leverkusen", count: 1 }
-    ],
-    hints: [
-      "Nationality: Bulgarian — his country's all-time top scorer with 48 goals",
-      "Club: Won two Premier League titles at the same Manchester club",
-      "Era: Won the Premier League Golden Boot in 2010–11 with an iconic five-goal haul against Blackburn"
-    ]
-  },
+    ]  },
   {
     id: 8,
     player: "Luis Suárez",
@@ -342,13 +296,7 @@ const PUZZLES = [
       { icon: "🇳🇱", name: "Eredivisie", detail: "2009–10, 2010–11 with Ajax", count: 2 },
       { icon: "👟", name: "European Golden Shoe", detail: "2013–14 with Liverpool — 31 PL goals", count: 1 },
       { icon: "🇦🇷", name: "Primera División", detail: "2022 with Atlético Nacional / Nacional", count: 1 }
-    ],
-    hints: [
-      "Nationality: Uruguayan — won the Copa América with his national team in 2011",
-      "Club: Formed a devastating front three at Barcelona alongside Messi and Neymar",
-      "Era: Won the European Golden Shoe with Liverpool in 2013–14 despite never winning the league there"
-    ]
-  },
+    ]  },
   {
     id: 9,
     player: "Gareth Bale",
@@ -362,13 +310,7 @@ const PUZZLES = [
       { icon: "⭐", name: "UEFA Super Cup", detail: "2014, 2016, 2017, 2022 with Real Madrid", count: 4 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2007–08 with Tottenham", count: 1 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁿", name: "Copa del Rey", detail: "2013–14 with Real Madrid", count: 1 }
-    ],
-    hints: [
-      "Nationality: Welsh — led Wales to their first major tournament in 58 years at Euro 2016",
-      "Club: Signed for a world-record fee in 2013 and became a Champions League specialist",
-      "Era: Scored arguably the greatest overhead kick in Champions League final history in 2018"
-    ]
-  },
+    ]  },
   {
     id: 10,
     player: "Mikel Arteta",
@@ -380,13 +322,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁳󠁣󠁴󠣿", name: "Scottish Premier League", detail: "2002–03 with Rangers", count: 1 },
       { icon: "🏴󠁧󠁢󠁳󠁣󠁴󠣿", name: "Scottish League Cup", detail: "2002–03 with Rangers", count: 1 },
       { icon: "🌐", name: "UEFA Intertoto Cup", detail: "2001–02 with Paris Saint-Germain", count: 1 }
-    ],
-    hints: [
-      "Nationality: Spanish — never capped by the senior Spain national team despite his quality",
-      "Club: Won two FA Cups as a player at Arsenal — later returned as their manager",
-      "Era: Made his name at Everton before joining Arsenal in 2011 as club captain"
-    ]
-  },
+    ]  },
   {
     id: 11,
     player: "Thierry Henry",
@@ -402,13 +338,7 @@ const PUZZLES = [
       { icon: "🌍", name: "FIFA World Cup", detail: "1998 with France", count: 1 },
       { icon: "🌍", name: "UEFA European Championship", detail: "2000 with France", count: 1 },
       { icon: "👟", name: "European Golden Shoe", detail: "2003–04 & 2004–05", count: 2 }
-    ],
-    hints: [
-      "Nationality: French — won the World Cup in 1998 and Euro 2000",
-      "Club: Arsenal's all-time top scorer — part of the famous 'Invincibles' 2003–04 season",
-      "Era: Won the Champions League with Barcelona in 2009 alongside Messi and Xavi"
-    ]
-  },
+    ]  },
   {
     id: 12,
     player: "Cristiano Ronaldo",
@@ -424,13 +354,7 @@ const PUZZLES = [
       { icon: "🌍", name: "UEFA Nations League", detail: "2018–19 with Portugal", count: 1 },
       { icon: "🏅", name: "Ballon d'Or", detail: "2008, 2013, 2014, 2016, 2017", count: 5 },
       { icon: "👟", name: "European Golden Shoe", detail: "2007–08, 2010–11, 2013–14, 2014–15", count: 4 }
-    ],
-    hints: [
-      "Nationality: Portuguese — won the Euros and Nations League with his national team",
-      "Club: Won the Champions League with two different clubs — one English, one Spanish",
-      "Era: Won 5 Ballon d'Or awards and scored over 900 career goals"
-    ]
-  },
+    ]  },
   {
     id: 13,
     player: "Frank Lampard",
@@ -443,13 +367,7 @@ const PUZZLES = [
       { icon: "🇬🇧", name: "Premier League", detail: "2004–05, 2005–06, 2009–10 with Chelsea", count: 3 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "2007, 2009, 2010, 2012 with Chelsea", count: 4 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2005, 2007 with Chelsea", count: 2 }
-    ],
-    hints: [
-      "Nationality: English — one of the Premier League's greatest-ever midfielders",
-      "Club: Chelsea's all-time leading goalscorer with 211 goals — a midfielder",
-      "Era: Won the Champions League in 2012 — famously took the decisive penalty in the final shootout"
-    ]
-  },
+    ]  },
   {
     id: 14,
     player: "Steven Gerrard",
@@ -463,13 +381,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2001, 2003, 2012 with Liverpool", count: 3 },
       { icon: "⭐", name: "UEFA Super Cup", detail: "2001, 2005 with Liverpool", count: 2 },
       { icon: "🏴󠁧󠁢󠁳󠁣󠁴󠣿", name: "Scottish Premiership", detail: "2020–21 with Rangers (as manager)", count: 1 }
-    ],
-    hints: [
-      "Nationality: English — spent almost his entire career at one club, never winning the league",
-      "Club: Liverpool captain — famously dragged his team back from 3-0 down in a Champions League final",
-      "Era: Named PFA Players' Player of the Year in 2006 — considered one of England's greatest ever"
-    ]
-  },
+    ]  },
   {
     id: 15,
     player: "Wayne Rooney",
@@ -483,13 +395,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2006, 2009, 2010 with Manchester United", count: 3 },
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2008 with Manchester United", count: 1 },
       { icon: "⭐", name: "UEFA Super Cup", detail: "2008 with Manchester United", count: 1 }
-    ],
-    hints: [
-      "Nationality: English — England's all-time top scorer (53 goals) until surpassed by Harry Kane",
-      "Club: Manchester United's all-time top scorer — won 5 Premier League titles",
-      "Era: Won the Champions League in 2007–08 alongside Cristiano Ronaldo and Tevez"
-    ]
-  },
+    ]  },
   {
     id: 16,
     player: "Didier Drogba",
@@ -503,13 +409,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2005, 2007 with Chelsea", count: 2 },
       { icon: "🏆", name: "UEFA Europa League", detail: "2012–13 with Chelsea", count: 1 },
       { icon: "🌍", name: "Africa Cup of Nations", detail: "Did not win — Ivory Coast runners-up twice", count: "🥈" }
-    ],
-    hints: [
-      "Nationality: Ivorian — one of the most celebrated African players in Premier League history",
-      "Club: Chelsea legend — his header in the 88th minute of the 2012 Champions League final is iconic",
-      "Era: Won 4 Premier League titles and 4 FA Cups — lethal in cup finals throughout his career"
-    ]
-  },
+    ]  },
   {
     id: 17,
     player: "Sergio Agüero",
@@ -523,13 +423,7 @@ const PUZZLES = [
       { icon: "🇪🇸", name: "Copa del Rey", detail: "2012–13 with Atlético Madrid", count: 1 },
       { icon: "🌍", name: "Copa América", detail: "2021 with Argentina", count: 1 },
       { icon: "⭐", name: "UEFA Super Cup", detail: "2010 with Atlético Madrid", count: 1 }
-    ],
-    hints: [
-      "Nationality: Argentine — won the Copa América in 2021 in his final international tournament",
-      "Club: Manchester City's all-time top scorer — his 'Agüerooooo' goal in 2012 won them the title",
-      "Era: Won 4 Premier League titles at the Etihad — forced to retire early due to heart problems"
-    ]
-  },
+    ]  },
   {
     id: 18,
     player: "David Silva",
@@ -543,13 +437,7 @@ const PUZZLES = [
       { icon: "🌍", name: "FIFA World Cup", detail: "2010 with Spain", count: 1 },
       { icon: "🌍", name: "UEFA European Championship", detail: "2008 & 2012 with Spain", count: 2 },
       { icon: "🇪🇸", name: "La Liga", detail: "2021–22 with Real Sociedad", count: 1 }
-    ],
-    hints: [
-      "Nationality: Spanish — won the World Cup and two Euros with Spain's golden generation",
-      "Club: Spent a decade at Manchester City, known as 'El Mago' (The Magician)",
-      "Era: Widely regarded as one of the Premier League's greatest creative midfielders ever"
-    ]
-  },
+    ]  },
   {
     id: 19,
     player: "N'Golo Kanté",
@@ -563,13 +451,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "2017–18 with Chelsea", count: 1 },
       { icon: "🌍", name: "UEFA Super Cup", detail: "2021 with Chelsea", count: 1 },
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2021 with Chelsea", count: 1 }
-    ],
-    hints: [
-      "Nationality: French — won the World Cup in 2018 in Russia",
-      "Club: Won the Premier League with two different English clubs in consecutive seasons",
-      "Era: Won PFA Players' Player of the Year 2016–17 — the heartbeat of Leicester's miracle title"
-    ]
-  },
+    ]  },
   {
     id: 20,
     player: "Riyad Mahrez",
@@ -583,13 +465,7 @@ const PUZZLES = [
       { icon: "🏆", name: "UEFA Champions League", detail: "2022–23 with Manchester City", count: 1 },
       { icon: "🌍", name: "Africa Cup of Nations", detail: "2018–19 with Algeria", count: 1 },
       { icon: "👟", name: "PFA Players' Player of the Year", detail: "2015–16 with Leicester City", count: 1 }
-    ],
-    hints: [
-      "Nationality: Algerian — won the Africa Cup of Nations with Algeria in 2019",
-      "Club: Won the Premier League with Leicester before winning it 4 more times with Manchester City",
-      "Era: Won the treble with Manchester City in 2022–23 — Champions League, PL and FA Cup"
-    ]
-  },
+    ]  },
   {
     id: 21,
     player: "Dani Alves",
@@ -605,13 +481,7 @@ const PUZZLES = [
       { icon: "🌎", name: "Copa América", detail: "2019 with Brazil", count: 1 },
       { icon: "🌎", name: "FIFA Confederations Cup", detail: "2005 with Brazil", count: 1 },
       { icon: "🌎", name: "Copa Libertadores", detail: "2003 with São Paulo", count: 1 }
-    ],
-    hints: [
-      "Nationality: Brazilian — won the Copa América with Brazil in 2019",
-      "Club: Won 8 La Liga titles and 3 Champions Leagues — primarily at a Spanish giant",
-      "Era: Widely considered the most decorated player in football history"
-    ]
-  },
+    ]  },
   {
     id: 22,
     player: "Gerard Piqué",
@@ -625,13 +495,7 @@ const PUZZLES = [
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2009, 2011, 2015 with Barcelona", count: 3 },
       { icon: "🌍", name: "FIFA World Cup", detail: "2010 with Spain", count: 1 },
       { icon: "🇪🇺", name: "UEFA European Championship", detail: "2008 and 2012 with Spain", count: 2 }
-    ],
-    hints: [
-      "Nationality: Spanish — won the World Cup in 2010 and two European Championships",
-      "Club: One-club man for most of his career — won 8 La Liga titles at the same Spanish club",
-      "Era: Part of Spain's golden generation alongside Xavi, Iniesta and Villa"
-    ]
-  },
+    ]  },
   {
     id: 23,
     player: "Pedro Rodríguez",
@@ -647,13 +511,7 @@ const PUZZLES = [
       { icon: "🇪🇺", name: "UEFA European Championship", detail: "2008 and 2012 with Spain", count: 2 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "2017–18 with Chelsea", count: 1 },
       { icon: "🇪🇺", name: "UEFA Europa League", detail: "2018–19 with Chelsea; 2020–21 with Roma", count: 2 }
-    ],
-    hints: [
-      "Nationality: Spanish — won the World Cup in 2010 and two European Championships",
-      "Club: Won the treble with a Spanish club in 2015 before moving to the Premier League",
-      "Era: First player to score in El Clásico, Copa del Rey, Champions League and Club World Cup in a single season"
-    ]
-  },
+    ]  },
   {
     id: 24,
     player: "Javier Mascherano",
@@ -666,13 +524,7 @@ const PUZZLES = [
       { icon: "🇪🇸", name: "Copa del Rey", detail: "4 titles with Barcelona", count: 4 },
       { icon: "🌍", name: "Olympic Gold Medal", detail: "2004 Athens and 2008 Beijing with Argentina", count: 2 },
       { icon: "🌎", name: "Copa América", detail: "2021 with Argentina", count: 1 }
-    ],
-    hints: [
-      "Nationality: Argentine — won back-to-back Olympic gold medals in 2004 and 2008",
-      "Club: Won the Champions League and 5 La Liga titles at a Spanish giant",
-      "Era: Known as 'El Jefecito' — one of the most tenacious defensive midfielders of his generation"
-    ]
-  },
+    ]  },
   {
     id: 25,
     player: "Claude Makélélé",
@@ -685,13 +537,7 @@ const PUZZLES = [
       { icon: "🇬🇧", name: "Premier League", detail: "2004–05, 2005–06 with Chelsea", count: 2 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "2006–07, 2009–10 with Chelsea", count: 2 },
       { icon: "🇫🇷", name: "Ligue 1", detail: "2009–10 with Paris Saint-Germain", count: 1 }
-    ],
-    hints: [
-      "Nationality: French — his role became so associated with him that the 'Makélélé role' was named after him",
-      "Club: Won the Champions League with Real Madrid before joining Chelsea under José Mourinho",
-      "Era: Sold by Real Madrid in 2003 — Zidane later said it was a massive mistake to let him leave"
-    ]
-  },
+    ]  },
   {
     id: 26,
     player: "Michael Essien",
@@ -702,13 +548,7 @@ const PUZZLES = [
       { icon: "🇬🇧", name: "Premier League", detail: "2005–06, 2009–10 with Chelsea", count: 2 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "2006–07, 2008–09, 2009–10 with Chelsea", count: 3 },
       { icon: "🏆", name: "UEFA Champions League", detail: "2011–12 with Chelsea", count: 1 }
-    ],
-    hints: [
-      "Nationality: Ghanaian — nicknamed 'The Bison' for his powerful style of play",
-      "Club: Won the Champions League and two Premier League titles at Stamford Bridge",
-      "Era: Signed by Chelsea from Lyon in 2005 — one of Mourinho's key signings"
-    ]
-  },
+    ]  },
   {
     id: 27,
     player: "Florent Malouda",
@@ -720,13 +560,7 @@ const PUZZLES = [
       { icon: "🇬🇧", name: "Premier League", detail: "2009–10, 2004–05 with Chelsea and Lyon", count: 2 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "2009–10 with Chelsea", count: 1 },
       { icon: "🇫🇷", name: "Ligue 1", detail: "2003–04, 2004–05, 2005–06 with Lyon", count: 3 }
-    ],
-    hints: [
-      "Nationality: French — won three consecutive Ligue 1 titles with Lyon",
-      "Club: Won the Champions League in the famous 2012 final against Bayern Munich",
-      "Era: Part of the Chelsea squad that won the FA Cup in 2010 under Carlo Ancelotti"
-    ]
-  },
+    ]  },
   {
     id: 28,
     player: "Salomon Kalou",
@@ -738,13 +572,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "2006–07, 2009–10 with Chelsea", count: 2 },
       { icon: "🏆", name: "UEFA Champions League", detail: "2011–12 with Chelsea", count: 1 },
       { icon: "🇪🇺", name: "UEFA Europa League", detail: "2016–17 with Lille", count: 1 }
-    ],
-    hints: [
-      "Nationality: Ivorian — brother of former Chelsea teammate Bonaventure Kalou",
-      "Club: Won the Champions League as a squad player in Chelsea's famous 2012 triumph",
-      "Era: Scored the penalty that kept Chelsea in the 2012 Champions League semi-final shootout"
-    ]
-  },
+    ]  },
   {
     id: 29,
     player: "Anderson",
@@ -756,13 +584,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2008–09, 2009–10, 2012–13 with Manchester United", count: 3 },
       { icon: "🏆", name: "UEFA Champions League", detail: "2007–08 with Manchester United", count: 1 },
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2008 with Manchester United", count: 1 }
-    ],
-    hints: [
-      "Nationality: Brazilian — won the Champions League in his debut season at Old Trafford",
-      "Club: Won 4 Premier League titles at Manchester United under Sir Alex Ferguson",
-      "Era: Scored in the 2008 Champions League final penalty shootout against Chelsea"
-    ]
-  },
+    ]  },
   {
     id: 30,
     player: "Darren Fletcher",
@@ -775,13 +597,7 @@ const PUZZLES = [
       { icon: "🏆", name: "UEFA Champions League", detail: "2007–08 with Manchester United", count: 1 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2005–06, 2009–10 with Manchester United", count: 2 },
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2008 with Manchester United", count: 1 }
-    ],
-    hints: [
-      "Nationality: Scottish — one of the most decorated Scottish players of the Premier League era",
-      "Club: Won 5 Premier League titles at Manchester United under Sir Alex Ferguson",
-      "Era: Overcame a serious illness to return to football and continue his career at Old Trafford"
-    ]
-  },
+    ]  },
   {
     id: 31,
     player: "Patrice Evra",
@@ -794,13 +610,7 @@ const PUZZLES = [
       { icon: "🏆", name: "UEFA Champions League", detail: "2007–08 with Manchester United", count: 1 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2005–06, 2009–10, 2016–17 with Manchester United and Juventus", count: 3 },
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2008 with Manchester United", count: 1 }
-    ],
-    hints: [
-      "Nationality: French — famously said 'I love this game' in a viral post-match interview",
-      "Club: Won 5 Premier League titles as first-choice left back at Manchester United",
-      "Era: Joined from Monaco in January 2006 — became one of the best left backs in the world"
-    ]
-  },
+    ]  },
   {
     id: 32,
     player: "Wes Brown",
@@ -813,13 +623,7 @@ const PUZZLES = [
       { icon: "🏆", name: "UEFA Champions League", detail: "2007–08 with Manchester United", count: 1 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2005–06, 2009–10 with Manchester United", count: 2 },
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2008 with Manchester United", count: 1 }
-    ],
-    hints: [
-      "Nationality: English — came through the Manchester United academy under Sir Alex Ferguson",
-      "Club: Won 5 Premier League titles at Old Trafford across a 15-year career at the club",
-      "Era: Started the 2008 Champions League final against Chelsea in Moscow"
-    ]
-  },
+    ]  },
   {
     id: 33,
     player: "Lucas Leiva",
@@ -831,13 +635,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2011–12 with Liverpool", count: 1 },
       { icon: "🇮🇹", name: "UEFA Europa League", detail: "2017–18 with Lazio", count: 1 },
       { icon: "🇧🇷", name: "Copa do Brasil", detail: "2016 with Grêmio", count: 1 }
-    ],
-    hints: [
-      "Nationality: Brazilian — spent 10 years at Liverpool before moving to Lazio",
-      "Club: A cult hero at Anfield despite never winning the league or Champions League there",
-      "Era: Won the Europa League with Lazio in 2018 after leaving Liverpool"
-    ]
-  },
+    ]  },
   {
     id: 34,
     player: "Jordan Henderson",
@@ -851,13 +649,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2021–22 with Liverpool", count: 1 },
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2019 with Liverpool", count: 1 },
       { icon: "⭐", name: "UEFA Super Cup", detail: "2019 with Liverpool", count: 1 }
-    ],
-    hints: [
-      "Nationality: English — lifted the Champions League trophy as captain in Madrid in 2019",
-      "Club: Captained Liverpool to their first league title in 30 years in 2019–20",
-      "Era: Signed from Sunderland by Kenny Dalglish in 2011 — became club captain under Klopp"
-    ]
-  },
+    ]  },
   {
     id: 35,
     player: "Fabinho",
@@ -872,13 +664,7 @@ const PUZZLES = [
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2019 with Liverpool", count: 1 },
       { icon: "⭐", name: "UEFA Super Cup", detail: "2019 with Liverpool", count: 1 },
       { icon: "🇫🇷", name: "Ligue 1", detail: "2016–17 with Monaco", count: 1 }
-    ],
-    hints: [
-      "Nationality: Brazilian — won Ligue 1 with Monaco before becoming Liverpool's defensive anchor",
-      "Club: Won the Champions League, Premier League, FA Cup and League Cup at Anfield",
-      "Era: Signed from Monaco in 2018 — immediately became one of the best defensive midfielders in the world"
-    ]
-  },
+    ]  },
   {
     id: 36,
     player: "Ilkay Gündogan",
@@ -893,13 +679,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "2022–23 with Manchester City; one previous win", count: 2 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2019–20, 2020–21 with Manchester City", count: 2 },
       { icon: "🇪🇸", name: "La Liga", detail: "2024–25 with Barcelona", count: 1 }
-    ],
-    hints: [
-      "Nationality: German — scored twice in the 2023 FA Cup final to help win the treble",
-      "Club: Won the Premier League treble with Manchester City in 2022–23",
-      "Era: Left Man City on a free transfer to join Barcelona in 2023"
-    ]
-  },
+    ]  },
   {
     id: 37,
     player: "Fernandinho",
@@ -911,13 +691,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "6 League Cup wins with Manchester City", count: 6 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "2018–19 with Manchester City", count: 1 },
       { icon: "🏆", name: "UEFA Champions League", detail: "2022–23 with Manchester City", count: 1 }
-    ],
-    hints: [
-      "Nationality: Brazilian — spent 9 seasons as Manchester City's midfield anchor",
-      "Club: Won 5 Premier League titles and 6 League Cups at Manchester City",
-      "Era: Signed from Shakhtar Donetsk in 2013 — the engine of Guardiola's dominant City side"
-    ]
-  },
+    ]  },
   {
     id: 38,
     player: "Ricardo Carvalho",
@@ -931,13 +705,7 @@ const PUZZLES = [
       { icon: "🇵🇹", name: "Primeira Liga", detail: "2002–03, 2003–04 with Porto", count: 2 },
       { icon: "🇪🇸", name: "La Liga", detail: "2011–12 with Real Madrid", count: 1 },
       { icon: "🇫🇷", name: "Ligue 1", detail: "2013–14 with Monaco", count: 1 }
-    ],
-    hints: [
-      "Nationality: Portuguese — won the Champions League with Porto under José Mourinho in 2004",
-      "Club: Followed Mourinho from Porto to Chelsea where he was first-choice centre back",
-      "Era: Part of one of the most miserly defences in Premier League history under Mourinho"
-    ]
-  },
+    ]  },
   {
     id: 39,
     player: "Esteban Cambiasso",
@@ -952,13 +720,7 @@ const PUZZLES = [
       { icon: "🇪🇸", name: "La Liga", detail: "2001–02, 2002–03 with Real Madrid", count: 2 },
       { icon: "🇪🇸", name: "Copa del Rey", detail: "2002–03 with Real Madrid", count: 1 },
       { icon: "🌎", name: "Copa América", detail: "1993 with Argentina (youth)", count: 1 }
-    ],
-    hints: [
-      "Nationality: Argentine — won the treble with Inter Milan under José Mourinho in 2010",
-      "Club: Won 5 consecutive Serie A titles at Inter Milan between 2006 and 2010",
-      "Era: Previously at Real Madrid before joining Inter — known as 'El Cuchu'"
-    ]
-  },
+    ]  },
   {
     id: 40,
     player: "Diego Godín",
@@ -971,13 +733,7 @@ const PUZZLES = [
       { icon: "🇪🇺", name: "UEFA Europa League", detail: "2011–12, 2017–18 with Atlético Madrid", count: 2 },
       { icon: "⭐", name: "UEFA Super Cup", detail: "2010–11, 2012 with Atlético Madrid", count: 2 },
       { icon: "🌎", name: "Copa América", detail: "2011 with Uruguay", count: 1 }
-    ],
-    hints: [
-      "Nationality: Uruguayan — captained Uruguay at multiple World Cups",
-      "Club: Won La Liga with Atlético Madrid in 2014 — scored the header that levelled the Champions League final",
-      "Era: Spent 9 years at Atlético Madrid — one of the best centre backs of his generation"
-    ]
-  },
+    ]  },
   {
     id: 41,
     player: "Andrés Iniesta",
@@ -990,13 +746,7 @@ const PUZZLES = [
       { icon: "🏆", name: "UEFA Champions League", detail: "2006, 2009, 2011 & 2015 with Barcelona", count: 4 },
       { icon: "🇪🇸", name: "La Liga", detail: "9 times with Barcelona (2005–2016)", count: 9 },
       { icon: "🇪🇸", name: "Copa del Rey", detail: "6 times with Barcelona", count: 6 }
-    ],
-    hints: [
-      "Nationality: Spanish — won the World Cup, Euro 2008, and Euro 2012",
-      "Club: Spent his entire top-level career at Barcelona, winning 9 La Liga titles",
-      "Era: Spanish midfielder who scored the 2010 World Cup final winner"
-    ]
-  },
+    ]  },
   {
     id: 42,
     player: "Luka Modrić",
@@ -1009,13 +759,7 @@ const PUZZLES = [
       { icon: "🏅", name: "FIFA Best Men's Player", detail: "2018", count: 1 },
       { icon: "🥇", name: "Ballon d'Or", detail: "2018", count: 1 },
       { icon: "🇭🇷", name: "UEFA Nations League", detail: "2023 with Croatia", count: 1 }
-    ],
-    hints: [
-      "Nationality: Croatian — won the Ballon d'Or in 2018 after leading Croatia to the World Cup final",
-      "Club: Has won the Champions League five times with the same Spanish club",
-      "Era: Croatian playmaker and five-time Champions League winner"
-    ]
-  },
+    ]  },
   {
     id: 43,
     player: "Samuel Eto'o",
@@ -1028,13 +772,7 @@ const PUZZLES = [
       { icon: "🇮🇹", name: "Serie A", detail: "2009–10 with Inter Milan", count: 1 },
       { icon: "🌍", name: "Africa Cup of Nations", detail: "2000 & 2002 with Cameroon", count: 2 },
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2009 with Barcelona", count: 1 }
-    ],
-    hints: [
-      "Nationality: Cameroonian — won the Africa Cup of Nations twice with Cameroon",
-      "Club: Won the Champions League with both Barcelona and Inter Milan",
-      "Era: Cameroonian striker who won the treble with both Barcelona and Inter"
-    ]
-  },
+    ]  },
   {
     id: 44,
     player: "Zlatan Ibrahimović",
@@ -1047,13 +785,7 @@ const PUZZLES = [
       { icon: "🇪🇸", name: "La Liga", detail: "2009–10 with Barcelona", count: 1 },
       { icon: "🇳🇱", name: "Eredivisie", detail: "2001–02 with Ajax", count: 1 },
       { icon: "🇸🇪", name: "Allsvenskan", detail: "3 times with Malmö FF", count: 3 }
-    ],
-    hints: [
-      "Nationality: Swedish — one of the most-travelled footballers of his generation",
-      "Club: Won league titles in Netherlands, Italy, Spain, France, and Sweden",
-      "Era: Swedish striker who won league titles in six different countries"
-    ]
-  },
+    ]  },
   {
     id: 45,
     player: "Arjen Robben",
@@ -1066,13 +798,7 @@ const PUZZLES = [
       { icon: "🇬🇧", name: "Premier League", detail: "2004–05 with Chelsea", count: 1 },
       { icon: "🇪🇸", name: "La Liga", detail: "2007–08 with Real Madrid", count: 1 },
       { icon: "🇩🇪", name: "DFB-Pokal", detail: "5 times with Bayern Munich", count: 5 }
-    ],
-    hints: [
-      "Nationality: Dutch — represented the Netherlands at multiple World Cups",
-      "Club: Won the Bundesliga eight times with Bayern Munich",
-      "Era: Dutch winger famous for his diagonal runs and the 2013 UCL final winner"
-    ]
-  },
+    ]  },
   {
     id: 46,
     player: "Franck Ribéry",
@@ -1085,13 +811,7 @@ const PUZZLES = [
       { icon: "🇫🇷", name: "Ligue 1", detail: "1 time (Marseille era)", count: 1 },
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2013 with Bayern Munich", count: 1 },
       { icon: "⭐", name: "UEFA Super Cup", detail: "2013 with Bayern Munich", count: 1 }
-    ],
-    hints: [
-      "Nationality: French — spent over a decade at Bayern Munich winning the Bundesliga 8 times",
-      "Club: Won the treble in 2013 alongside Arjen Robben at Bayern Munich",
-      "Era: French winger who spent over a decade at Bayern Munich"
-    ]
-  },
+    ]  },
   {
     id: 47,
     player: "Xabi Alonso",
@@ -1104,13 +824,7 @@ const PUZZLES = [
       { icon: "🏆", name: "UEFA Champions League", detail: "2005 with Liverpool, 2014 with Real Madrid", count: 2 },
       { icon: "🇬🇧", name: "Premier League", detail: "1 time with Liverpool", count: 1 },
       { icon: "🇩🇪", name: "Bundesliga", detail: "2 times with Bayern Munich", count: 2 }
-    ],
-    hints: [
-      "Nationality: Spanish — won the World Cup and back-to-back European Championships with Spain",
-      "Club: Won the Champions League with two different clubs — Liverpool (2005) and Real Madrid (2014)",
-      "Era: Spanish midfielder known for his range of passing and two UCL titles with different clubs"
-    ]
-  },
+    ]  },
   {
     id: 48,
     player: "Philipp Lahm",
@@ -1123,13 +837,7 @@ const PUZZLES = [
       { icon: "🏆", name: "UEFA Champions League", detail: "2012–13 with Bayern Munich", count: 1 },
       { icon: "🇩🇪", name: "Bundesliga", detail: "8 times with Bayern Munich", count: 8 },
       { icon: "🇩🇪", name: "DFB-Pokal", detail: "6 times with Bayern Munich", count: 6 }
-    ],
-    hints: [
-      "Nationality: German — captained Germany to World Cup glory in 2014",
-      "Club: Won the Bundesliga 8 times with Bayern Munich",
-      "Era: German captain who lifted the World Cup in his final international tournament"
-    ]
-  },
+    ]  },
   {
     id: 49,
     player: "Bastian Schweinsteiger",
@@ -1142,13 +850,7 @@ const PUZZLES = [
       { icon: "🇩🇪", name: "Bundesliga", detail: "8 times with Bayern Munich", count: 8 },
       { icon: "🇩🇪", name: "DFB-Pokal", detail: "7 times with Bayern Munich", count: 7 },
       { icon: "⭐", name: "UEFA Super Cup", detail: "2013 with Bayern Munich", count: 1 }
-    ],
-    hints: [
-      "Nationality: German — won the World Cup in 2014 and captained the national team",
-      "Club: Won the Bundesliga 8 times and Champions League once with Bayern Munich",
-      "Era: German midfielder and World Cup winner who captained his country"
-    ]
-  },
+    ]  },
   {
     id: 50,
     player: "Ronaldinho",
@@ -1161,13 +863,7 @@ const PUZZLES = [
       { icon: "🇪🇸", name: "La Liga", detail: "2 times with Barcelona", count: 2 },
       { icon: "🥇", name: "Ballon d'Or", detail: "2005", count: 1 },
       { icon: "🌎", name: "Copa América", detail: "1999 with Brazil", count: 1 }
-    ],
-    hints: [
-      "Nationality: Brazilian — won the World Cup in 2002 and later became a Barcelona legend",
-      "Club: Won the Ballon d'Or in 2005 at Barcelona under Frank Rijkaard",
-      "Era: Brazilian magician who won the Ballon d'Or in 2005 at Barcelona"
-    ]
-  },
+    ]  },
   {
     id: 51,
     player: "Roberto Carlos",
@@ -1180,13 +876,7 @@ const PUZZLES = [
       { icon: "🇪🇸", name: "La Liga", detail: "4 times with Real Madrid", count: 4 },
       { icon: "🌎", name: "Copa América", detail: "1997 & 1999 with Brazil", count: 2 },
       { icon: "🌍", name: "Intercontinental Cup", detail: "1998 with Real Madrid", count: 1 }
-    ],
-    hints: [
-      "Nationality: Brazilian — won the World Cup in 2002 and played most of his career at Real Madrid",
-      "Club: Won the Champions League three times with Real Madrid in the late 1990s and early 2000s",
-      "Era: Brazilian left-back famous for his thunderous free-kicks at Real Madrid"
-    ]
-  },
+    ]  },
   {
     id: 52,
     player: "Pavel Nedvěd",
@@ -1199,13 +889,7 @@ const PUZZLES = [
       { icon: "🇮🇹", name: "Coppa Italia", detail: "3 times with Juventus", count: 3 },
       { icon: "🥇", name: "Ballon d'Or", detail: "2003", count: 1 },
       { icon: "🇨🇿", name: "Czech First League", detail: "2 times with Sparta Prague", count: 2 }
-    ],
-    hints: [
-      "Nationality: Czech — represented the Czech Republic and was one of Europe's best midfielders",
-      "Club: Won the Serie A five times with Juventus and the Ballon d'Or in 2003",
-      "Era: Czech midfielder who won the Ballon d'Or despite missing the UCL final through suspension"
-    ]
-  },
+    ]  },
   {
     id: 53,
     player: "Carlos Puyol",
@@ -1218,13 +902,7 @@ const PUZZLES = [
       { icon: "🏆", name: "UEFA Champions League", detail: "2006, 2009 & 2011 with Barcelona", count: 3 },
       { icon: "🇪🇸", name: "La Liga", detail: "6 times with Barcelona", count: 6 },
       { icon: "🇪🇸", name: "Copa del Rey", detail: "2 times with Barcelona", count: 2 }
-    ],
-    hints: [
-      "Nationality: Spanish — won the World Cup and two European Championships with Spain",
-      "Club: Legendary captain of Barcelona — won the Champions League three times",
-      "Era: Barcelona and Spain captain famous for his iconic header in the 2010 World Cup semi-final"
-    ]
-  },
+    ]  },
   {
     id: 54,
     player: "Ashley Cole",
@@ -1237,13 +915,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "7 times with Arsenal & Chelsea", count: 7 },
       { icon: "🇪🇺", name: "UEFA Europa League", detail: "2012–13 with Chelsea", count: 1 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "3 times with Chelsea", count: 3 }
-    ],
-    hints: [
-      "Nationality: English — capped over 100 times for England",
-      "Club: Won the FA Cup a record 7 times across Arsenal and Chelsea",
-      "Era: English left-back and record FA Cup winner"
-    ]
-  },
+    ]  },
   {
     id: 55,
     player: "John Terry",
@@ -1256,13 +928,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "FA Cup", detail: "5 times with Chelsea", count: 5 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "3 times with Chelsea", count: 3 },
       { icon: "🇪🇺", name: "UEFA Europa League", detail: "2012–13 with Chelsea", count: 1 }
-    ],
-    hints: [
-      "Nationality: English — captained Chelsea for over a decade",
-      "Club: Won the Premier League 5 times with Chelsea under multiple managers",
-      "Era: Chelsea captain who missed the decisive penalty in the 2008 UCL final"
-    ]
-  },
+    ]  },
   {
     id: 56,
     player: "Pepe",
@@ -1275,13 +941,7 @@ const PUZZLES = [
       { icon: "🇪🇺", name: "UEFA European Championship", detail: "2016 with Portugal", count: 1 },
       { icon: "🇩🇪", name: "Bundesliga", detail: "1 time (Porto era)", count: 1 },
       { icon: "🇵🇹", name: "Primeira Liga", detail: "3 times with Porto & Braga", count: 3 }
-    ],
-    hints: [
-      "Nationality: Portuguese — won the European Championship with Portugal in 2016",
-      "Club: Won the Champions League three times with Real Madrid",
-      "Era: Portuguese centre-back and three-time Champions League winner with Real Madrid"
-    ]
-  },
+    ]  },
   {
     id: 57,
     player: "Marcelo",
@@ -1294,13 +954,7 @@ const PUZZLES = [
       { icon: "🇪🇸", name: "Copa del Rey", detail: "2 times with Real Madrid", count: 2 },
       { icon: "🌍", name: "FIFA Club World Cup", detail: "4 times with Real Madrid", count: 4 },
       { icon: "🌎", name: "Copa América", detail: "2019 with Brazil", count: 1 }
-    ],
-    hints: [
-      "Nationality: Brazilian — won the Copa América with Brazil in 2019",
-      "Club: Won the Champions League five times with Real Madrid",
-      "Era: Brazilian left-back and Real Madrid's most decorated foreign player"
-    ]
-  },
+    ]  },
   {
     id: 58,
     player: "Vincent Kompany",
@@ -1313,13 +967,7 @@ const PUZZLES = [
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "4 times with Manchester City", count: 4 },
       { icon: "🇧🇪", name: "Belgian Pro League", detail: "1 time with Anderlecht", count: 1 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "Community Shield", detail: "3 times with Manchester City", count: 3 }
-    ],
-    hints: [
-      "Nationality: Belgian — captained Manchester City to multiple Premier League titles",
-      "Club: Won the Premier League 4 times with Manchester City",
-      "Era: Belgian captain who led Manchester City to their first Premier League title in 2012"
-    ]
-  },
+    ]  },
   {
     id: 59,
     player: "Nemanja Vidić",
@@ -1332,13 +980,7 @@ const PUZZLES = [
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2008 with Manchester United", count: 1 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "2 times with Manchester United", count: 2 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "Community Shield", detail: "4 times with Manchester United", count: 4 }
-    ],
-    hints: [
-      "Nationality: Serbian — one of the most dominant centre-backs in Premier League history",
-      "Club: Won the Premier League five times with Manchester United",
-      "Era: Serbian centre-back and one of the Premier League's most dominant defenders"
-    ]
-  },
+    ]  },
   {
     id: 60,
     player: "Rio Ferdinand",
@@ -1351,13 +993,7 @@ const PUZZLES = [
       { icon: "🌍", name: "FIFA Club World Cup", detail: "2008 with Manchester United", count: 1 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "EFL League Cup", detail: "1 time with Manchester United", count: 1 },
       { icon: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", name: "Community Shield", detail: "6 times with Manchester United", count: 6 }
-    ],
-    hints: [
-      "Nationality: English — capped over 80 times for England",
-      "Club: Won the Premier League six times with Manchester United",
-      "Era: English centre-back who won six Premier League titles at Manchester United"
-    ]
-  }
+    ]  }
 ];
 const MAX_ATTEMPTS = 3;
 const EPOCH = new Date('2025-01-01');
@@ -1366,7 +1002,7 @@ const puzzleIndex = dayNum % PUZZLES.length;
 const puzzle = PUZZLES[puzzleIndex];
 const STORAGE_KEY = 'tc-game-' + puzzleIndex;
 const STATS_KEY = 'tc-stats';
-let state = { attempts: 0, solved: false, failed: false, hintsUsed: 0, guesses: [] };
+let state = { attempts: 0, solved: false, failed: false, hintUsed: false, guesses: [] };
 let statsData = { played: 0, won: 0, streak: 0, dist: { 1: 0, 2: 0, 3: 0, miss: 0 } };
 function init() {
   loadStats();
@@ -1412,14 +1048,14 @@ function renderPips() {
   }
 }
 function restoreHints() {
-  for (let i = 1; i <= state.hintsUsed; i++) {
-    const btn = document.getElementById('hint-' + i + '-btn');
+  const btn = document.getElementById('hint-btn');
+  if (state.hintUsed) {
     if (btn) { btn.classList.add('used'); btn.disabled = true; }
-  }
-  if (state.hintsUsed > 0) {
     const reveal = document.getElementById('hint-reveal');
-    reveal.innerHTML = '<strong>Hint ' + state.hintsUsed + ':</strong> ' + puzzle.hints[state.hintsUsed - 1];
+    reveal.innerHTML = 'Nationality: ' + puzzle.nationality;
     reveal.classList.add('visible');
+  } else if (state.attempts >= 2 && !state.solved && !state.failed) {
+    if (btn) btn.disabled = false;
   }
 }
 function restoreBanner() {
@@ -1432,17 +1068,14 @@ function restoreBanner() {
     showBanner('✗ Not quite — ' + remaining + ' attempt' + (remaining === 1 ? '' : 's') + ' left', 'fail');
   }
 }
-function showHint(n) {
-  if (state.solved || state.failed) return;
-  if (n > state.hintsUsed + 1 || n <= state.hintsUsed) return;
-  state.hintsUsed = n;
+function showHint() {
+  if (state.solved || state.failed || state.hintUsed) return;
+  state.hintUsed = true;
   saveState();
-  for (let i = 1; i <= n; i++) {
-    const btn = document.getElementById('hint-' + i + '-btn');
-    if (btn) { btn.classList.add('used'); btn.disabled = true; }
-  }
+  const btn = document.getElementById('hint-btn');
+  if (btn) { btn.classList.add('used'); btn.disabled = true; }
   const reveal = document.getElementById('hint-reveal');
-  reveal.innerHTML = '<strong>Hint ' + n + ':</strong> ' + puzzle.hints[n - 1];
+  reveal.innerHTML = 'Nationality: ' + puzzle.nationality;
   reveal.classList.add('visible');
 }
 const ALL_NAMES = [...new Set(PUZZLES.map(p => p.player))];
@@ -1485,6 +1118,7 @@ function submitGuess() {
   state.guesses.push({ guess: raw, correct });
   if (pip) pip.classList.add(correct ? 'correct' : 'wrong');
   input.value = '';
+  if (!correct && state.attempts >= 2 && !state.hintUsed) { const hBtn = document.getElementById('hint-btn'); if (hBtn) hBtn.disabled = false; }
   if (correct) {
     state.solved = true;
     showBanner('✓ Correct! It was <strong>' + puzzle.player + '</strong>', 'success');

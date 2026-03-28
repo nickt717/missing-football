@@ -56,7 +56,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 #guess-input:focus{border-color:var(--accent)}
 #guess-input::placeholder{color:var(--text-dim)}
 .guess-btn{background:var(--accent);border:none;border-radius:var(--radius-sm);color:#000;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;padding:10px 20px;cursor:pointer}
-.hints-row{display:flex;gap:6px;margin-top:.75rem;flex-wrap:wrap}
+.hint-row{margin-top:.75rem}
 .hint-btn{background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-muted);font-family:'Inter',sans-serif;font-size:12px;padding:5px 10px;cursor:pointer;transition:all .15s}
 .hint-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
 .hint-btn:disabled{opacity:.4;cursor:default}
@@ -118,10 +118,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
       <input type="text" id="guess-input" placeholder="Type the missing club…" autocomplete="off" autocorrect="off" spellcheck="false"/>
       <button class="guess-btn" onclick="submitGuess()">Guess</button>
     </div>
-    <div class="hints-row">
-      <button class="hint-btn" id="hint-btn-0" onclick="revealHint(0)">Hint 1</button>
-      <button class="hint-btn" id="hint-btn-1" onclick="revealHint(1)">Hint 2</button>
-      <button class="hint-btn" id="hint-btn-2" onclick="revealHint(2)">Hint 3</button>
+    <div class="hint-row">
+      <button class="hint-btn" id="hint-btn" onclick="revealHint()" disabled>💡 Hint</button>
     </div>
     <div class="hint-reveal" id="hint-reveal"></div>
     <div class="result-banner" id="result-banner"></div>
@@ -212,7 +210,7 @@ const PUZZLES=[
 ,{id:59,player:"Robbie Fowler",nationality:"English",position:"Striker",clubs:[{name:"Liverpool",years:"1993–2001"},{name:"Leeds United",years:"2001–2003"},{name:"Manchester City",years:"2003–2006"},{name:"???",years:"2006–2007"},{name:"Cardiff City",years:"2007"},{name:"Liverpool",years:"2006–2007"},{name:"Blackburn Rovers",years:"2008"},{name:"Perth Glory",years:"2009–2010"}],answer:"Liverpool",acceptedAnswers:["liverpool","liverpool fc","lfc"],hints:["Country/League: English football, Premier League","Era: He made a sentimental return to his boyhood club in January 2006 under Rafael Benítez","Clue: Known as 'God' on the Kop — this was his emotional second spell at the club"]}
 ,{id:60,player:"Emre Belözoğlu",nationality:"Turkish",position:"Midfielder",clubs:[{name:"Galatasaray",years:"1997–2000"},{name:"Inter Milan",years:"2000–2003"},{name:"Newcastle United",years:"2003–2005"},{name:"Fenerbahçe",years:"2005–2007"},{name:"Atlético Madrid",years:"2007–2008"},{name:"???",years:"2008–2009"},{name:"Fenerbahçe",years:"2009–2014"},{name:"Istanbul Başakşehir",years:"2015–2021"}],answer:"Newcastle United",acceptedAnswers:["newcastle united","newcastle","nufc","the magpies"],hints:["Country/League: English football, Premier League","Era: He returned to Newcastle on loan in 2008–09 for a second spell","Clue: Turkish international — his first Newcastle spell was 2003–05, this was a brief loan return"]}
 ];
-let state={puzzleIndex:0,attempts:0,maxAttempts:3,solved:false,failed:false,hintsUsed:[]};
+let state={puzzleIndex:0,attempts:0,maxAttempts:3,solved:false,failed:false,hintUsed:false};
 let puzzle;
 function loadStorage(){try{const r=localStorage.getItem('missingclub_v1');return r?JSON.parse(r):{stats:defaultStats(),sessions:{}};}catch{return{stats:defaultStats(),sessions:{}};}}
 function saveStorage(d){try{localStorage.setItem('missingclub_v1',JSON.stringify(d));}catch{}}
@@ -223,16 +221,16 @@ function normalise(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\
 function checkGuess(guess,puzzle){const g=normalise(guess);return puzzle.acceptedAnswers.some(a=>normalise(a)===g);}
 document.addEventListener('DOMContentLoaded',()=>{state.puzzleIndex=getDailyPuzzleIndex();loadPuzzle(state.puzzleIndex);renderArchive();renderStats();document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitGuess();});});
 function loadPuzzle(idx){
-  puzzle=PUZZLES[idx];state.puzzleIndex=idx;state.attempts=0;state.solved=false;state.failed=false;state.hintsUsed=[];
+  puzzle=PUZZLES[idx];state.puzzleIndex=idx;state.attempts=0;state.solved=false;state.failed=false;state.hintUsed=false;
   document.getElementById('puzzle-badge').textContent='PUZZLE #'+puzzle.id;
   document.getElementById('puzzle-title').textContent=puzzle.player;
   document.getElementById('puzzle-sub').textContent=puzzle.nationality+' · '+puzzle.position+' · Guess the missing club';
   renderTimeline(puzzle,false);resetPips();
   document.getElementById('result-banner').innerHTML='';document.getElementById('hint-reveal').innerHTML='';
   document.getElementById('post-game-btns').style.display='none';document.getElementById('guess-section').style.display='block';document.getElementById('guess-input').value='';
-  [0,1,2].forEach(i=>{const b=document.getElementById('hint-btn-'+i);if(b){b.classList.remove('used');b.disabled=false;}});
+  const hb=document.getElementById('hint-btn');if(hb){hb.classList.remove('used');hb.disabled=true;}
   const saved=storage.sessions['p'+idx];
-  if(saved){state.attempts=saved.attempts;state.solved=saved.solved;state.failed=saved.failed;state.hintsUsed=saved.hintsUsed||[];state.hintsUsed.forEach(h=>markHintUsed(h));if(saved.hintTexts)document.getElementById('hint-reveal').innerHTML=saved.hintTexts;[0,1,2].forEach((pip,i)=>{const el=document.getElementById('pip-'+i);if(el&&saved.pips&&saved.pips[i])el.classList.add(saved.pips[i]);});if(state.solved||state.failed)showEndState(state.solved,puzzle);renderTimeline(puzzle,state.solved||state.failed);}
+  if(saved){state.attempts=saved.attempts;state.solved=saved.solved;state.failed=saved.failed;state.hintUsed=saved.hintUsed||false;const hintBtnS=document.getElementById('hint-btn');if(state.hintUsed){if(hintBtnS){hintBtnS.classList.add('used');hintBtnS.disabled=true;}if(saved.hintText)document.getElementById('hint-reveal').innerHTML=saved.hintText;}else if(state.attempts>=2&&!state.solved&&!state.failed){if(hintBtnS)hintBtnS.disabled=false;}[0,1,2].forEach((pip,i)=>{const el=document.getElementById('pip-'+i);if(el&&saved.pips&&saved.pips[i])el.classList.add(saved.pips[i]);});if(state.solved||state.failed)showEndState(state.solved,puzzle);renderTimeline(puzzle,state.solved||state.failed);}
 }
 function renderTimeline(puzzle,reveal){
   const tl=document.getElementById('timeline');tl.innerHTML='';
@@ -250,7 +248,7 @@ function submitGuess(){
   if(state.solved||state.failed)return;const input=document.getElementById('guess-input');const val=input.value.trim();if(!val){input.focus();return;}
   const puzzle=PUZZLES[state.puzzleIndex];const correct=checkGuess(val,puzzle);const pip=document.getElementById('pip-'+state.attempts);
   if(correct){pip.classList.add('correct');state.solved=true;recordResult(true,state.attempts+1);showEndState(true,puzzle);renderTimeline(puzzle,true);}
-  else{pip.classList.add('wrong');state.attempts++;if(state.attempts>=state.maxAttempts){state.failed=true;recordResult(false,0);showEndState(false,puzzle);renderTimeline(puzzle,true);}else{const remaining=state.maxAttempts-state.attempts;document.getElementById('result-banner').innerHTML='<div class="result-msg fail">✗ Not quite — '+remaining+' attempt'+(remaining===1?'':'s')+' left</div>';}}
+  else{pip.classList.add('wrong');state.attempts++;if(state.attempts>=2&&!state.hintUsed){const hintBtnG=document.getElementById('hint-btn');if(hintBtnG)hintBtnG.disabled=false;}if(state.attempts>=state.maxAttempts){state.failed=true;recordResult(false,0);showEndState(false,puzzle);renderTimeline(puzzle,true);}else{const remaining=state.maxAttempts-state.attempts;document.getElementById('result-banner').innerHTML='<div class="result-msg fail">✗ Not quite — '+remaining+' attempt'+(remaining===1?'':'s')+' left</div>';}}
   input.value='';saveSession();
 }
 function showEndState(won,puzzle){
@@ -259,12 +257,17 @@ function showEndState(won,puzzle){
   else{banner.innerHTML='<div class="result-msg fail">The missing club was <strong>'+puzzle.answer+'</strong></div>';}
   document.getElementById('guess-section').querySelector('.guess-input-row').style.display='none';document.getElementById('post-game-btns').style.display='flex';
 }
-function revealHint(n){
-  if(state.solved||state.failed||state.hintsUsed.includes(n))return;const puzzle=PUZZLES[state.puzzleIndex];state.hintsUsed.push(n);markHintUsed(n);
-  const labels=['Country/League','City/Region','Clue'];const el=document.getElementById('hint-reveal');const sep=el.innerHTML?'<br>':'';
-  el.innerHTML=el.innerHTML+sep+'<strong>'+labels[n]+':</strong> '+puzzle.hints[n];saveSession({hintsUsed:state.hintsUsed,hintTexts:el.innerHTML});
+function revealHint(){
+  if(state.solved||state.failed||state.hintUsed)return;
+  const puzzle=PUZZLES[state.puzzleIndex];
+  state.hintUsed=true;
+  const league=puzzle.clubs[puzzle.missingIndex].league;
+  const text='League: '+league;
+  const btn=document.getElementById('hint-btn');
+  if(btn){btn.disabled=true;btn.classList.add('used');}
+  document.getElementById('hint-reveal').innerHTML=text;
+  saveSession({hintUsed:true,hintText:text});
 }
-function markHintUsed(n){const b=document.getElementById('hint-btn-'+n);if(b){b.classList.add('used');b.disabled=true;}}
 function resetPips(){[0,1,2].forEach(i=>{const p=document.getElementById('pip-'+i);if(p)p.className='pip';});}
 function getPipStates(){return[0,1,2].map(i=>{const p=document.getElementById('pip-'+i);if(p){if(p.classList.contains('correct'))return'correct';if(p.classList.contains('wrong'))return'wrong';}return null;});}
 function saveSession(extra){const key='p'+state.puzzleIndex;storage.sessions[key]=Object.assign(storage.sessions[key]||{},{attempts:state.attempts,solved:state.solved,failed:state.failed},extra);if(!extra?.pips)storage.sessions[key].pips=getPipStates();saveStorage(storage);}
