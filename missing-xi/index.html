@@ -219,9 +219,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
       <button class="guess-btn" onclick="submitGuess()">Guess</button>
     </div>
     <div class="hints-row">
-      <button class="hint-btn" id="hint-btn-0" onclick="revealHint(0)"><span class="hint-icon">?</span> Position</button>
-      <button class="hint-btn" id="hint-btn-1" onclick="revealHint(1)"><span class="hint-icon">?</span> Nationality</button>
-      <button class="hint-btn" id="hint-btn-2" onclick="revealHint(2)"><span class="hint-icon">?</span> Clue</button>
+      <button class="hint-btn" id="hint-btn-0" onclick="revealHint(0)"><span class="hint-icon">?</span> Clue 1</button>
+      <button class="hint-btn" id="hint-btn-1" onclick="revealHint(1)"><span class="hint-icon">?</span> Clue 2</button>
+      <button class="hint-btn" id="hint-btn-2" onclick="revealHint(2)"><span class="hint-icon">?</span> Clue 3</button>
     </div>
     <div class="hint-reveal" id="hint-reveal"></div>
   </div>
@@ -803,10 +803,9 @@ function revealHint(n){
   const team=state.teamKey==='a'?PUZZLES[state.puzzleIndex].teamA:PUZZLES[state.puzzleIndex].teamB;
   state.hintsUsed.push(n);
   markHintUsed(n);
-  const labels=['Position','Nationality','Clue'];
   const el=document.getElementById('hint-reveal');
   const sep=el.innerHTML?'<br>':'';
-  el.innerHTML=el.innerHTML+sep+`<strong>${labels[n]}:</strong> ${team.hints[n]}`;
+  el.innerHTML=el.innerHTML+sep+team.hints[n];
   saveSession({hintsUsed:state.hintsUsed,hintTexts:el.innerHTML});
 }
 function markHintUsed(n){const b=document.getElementById(`hint-btn-${n}`);if(b){b.classList.add('used');b.disabled=true;}}
