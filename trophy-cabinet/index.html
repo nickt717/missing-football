@@ -997,9 +997,9 @@ const PUZZLES = [
     ]  }
 ];
 const MAX_ATTEMPTS = 3;
-const EPOCH = new Date('2025-01-01');
+const EPOCH = new Date('2026-04-01');
 const dayNum = Math.floor((Date.now() - EPOCH.getTime()) / 86400000);
-const puzzleIndex = dayNum % PUZZLES.length;
+const puzzleIndex = dayNum < 0 ? 0 : dayNum % PUZZLES.length;
 const puzzle = PUZZLES[puzzleIndex];
 const STORAGE_KEY = 'tc-game-' + puzzleIndex;
 const STATS_KEY = 'tc-stats';
@@ -1022,7 +1022,7 @@ function init() {
   }
 }
 function renderPuzzle() {
-  document.getElementById('puzzle-badge').textContent = 'Puzzle #' + puzzle.id;
+  document.getElementById('puzzle-badge').textContent = 'Puzzle #' + Math.max(1, dayNum + 1);
   document.getElementById('puzzle-title').textContent = 'Whose Trophy Cabinet?';
   document.getElementById('puzzle-sub').textContent = 'Identify the footballer from their trophy haul — ' + puzzle.trophies.length + ' honours on display';
 }
@@ -1237,7 +1237,9 @@ function showToast(msg) {
 function renderArchive() {
   const list = document.getElementById('archive-list');
   list.innerHTML = '';
+  const maxIdx = Math.min(Math.max(0, dayNum), PUZZLES.length - 1);
   PUZZLES.forEach((p, i) => {
+    if (i > maxIdx) return;
     const saved = localStorage.getItem('tc-game-' + i);
     const s = saved ? JSON.parse(saved) : null;
     const statusClass = s ? (s.solved ? 'solved' : s.failed ? 'failed' : '') : '';

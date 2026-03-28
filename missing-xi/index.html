@@ -620,10 +620,10 @@ const PUZZLES = [
 // ═══════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════
+function getDayNum(){return Math.floor((new Date()-new Date('2026-04-01'))/86400000);}
 function getDailyPuzzleIndex(){
-  const start=new Date("2025-01-01");
-  const dayNum=Math.floor((new Date()-start)/86400000);
-  return dayNum%PUZZLES.length;
+  const d=getDayNum();
+  return d<0?0:d%PUZZLES.length;
 }
 function normaliseAnswer(s){
   return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s]/g,"").trim();
@@ -652,6 +652,7 @@ let storage=loadStorage();
 document.addEventListener('DOMContentLoaded',()=>{
   state.puzzleIndex=getDailyPuzzleIndex();
   loadPuzzle(state.puzzleIndex,'a');
+  document.getElementById('puzzle-badge').textContent='Puzzle #'+Math.max(1,getDayNum()+1);
   renderArchive();
   renderStats();
   document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitGuess();});
@@ -836,7 +837,9 @@ function setView(view){
 function renderArchive(){
   const grid=document.getElementById('archive-grid');
   grid.innerHTML='';
+  const maxIdx=Math.min(Math.max(0,getDayNum()),PUZZLES.length-1);
   PUZZLES.forEach((puzzle,idx)=>{
+    if(idx>maxIdx)return;
     const card=document.createElement('div');
     card.className='archive-card';
     card.innerHTML=`
