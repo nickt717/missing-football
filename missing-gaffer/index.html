@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Missing Gaffer — Daily Football Puzzle</title>
+<meta name="description" content="A daily football puzzle — guess the missing club from a manager's career history.">
+<meta property="og:title" content="Missing Gaffer — Daily Football Puzzle">
+<meta property="og:description" content="A daily football puzzle — guess the missing club from a manager's career history.">
+<meta property="og:url" content="https://missingfootball.com/missing-gaffer/">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f0f0f;--bg-card:#1a1a1a;--bg-elevated:#242424;--border:rgba(255,255,255,0.08);--border-strong:rgba(255,255,255,0.18);--text-primary:#f2f0eb;--text-muted:#888;--text-dim:#555;--accent:#f5c518;--accent-dim:rgba(245,197,24,0.15);--red:#e03c31;--green:#27ae60;--radius:10px;--radius-sm:6px;}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;padding-bottom:3rem}
+.site-header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-inner{max-width:560px;margin:0 auto;padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Bebas Neue',sans-serif;letter-spacing:.04em;line-height:1;text-align:center}
+.logo-main{font-size:22px;color:var(--text-primary)}
+.logo-gaffer{font-size:22px;color:var(--accent);margin-left:6px}
+.header-nav{display:flex;gap:4px}
+.nav-btn{background:none;border:1px solid transparent;border-radius:var(--radius-sm);color:var(--text-muted);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:5px 12px;cursor:pointer;transition:all .15s}
+.nav-btn:hover{color:var(--text-primary);border-color:var(--border-strong)}
+.nav-btn.active{color:var(--accent);border-color:var(--accent);background:var(--accent-dim)}
+.home-link{color:var(--text-muted);font-size:12px;font-weight:500;text-decoration:none;letter-spacing:.02em;display:flex;align-items:center;gap:3px;transition:color .15s;white-space:nowrap}
+.home-link:hover{color:var(--text-primary)}
+.view{display:none;max-width:560px;margin:0 auto;padding:1.5rem 1.25rem 0}
+.view.active{display:block}
+.puzzle-meta{text-align:center;margin-bottom:1.1rem}
+.puzzle-badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(245,197,24,.3);border-radius:20px;padding:3px 12px;margin-bottom:.6rem}
+.puzzle-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.03em;color:var(--text-primary);margin-bottom:.25rem}
+.puzzle-sub{font-size:12px;color:var(--text-muted)}
+.timeline-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.timeline{display:flex;flex-direction:column;gap:0}
+.club-row{display:flex;align-items:center;gap:12px;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.club-row:last-child{border-bottom:none}
+.club-num{font-size:11px;color:var(--text-dim);font-weight:600;width:18px;text-align:right;flex-shrink:0}
+.club-dot{width:10px;height:10px;border-radius:50%;background:var(--text-dim);flex-shrink:0}
+.club-dot.known{background:var(--accent)}
+.club-dot.missing{background:var(--text-dim);border:2px dashed var(--accent)}
+.club-info{flex:1;min-width:0}
+.club-name{font-size:15px;font-weight:500;color:var(--text-primary)}
+.club-years{font-size:12px;color:var(--text-muted);margin-top:2px}
+.club-league{font-size:11px;color:var(--text-dim)}
+.missing-slot{display:flex;align-items:center;justify-content:center;padding:.55rem .75rem;background:var(--accent-dim);border:1px dashed rgba(245,197,24,.4);border-radius:var(--radius-sm);color:var(--accent);font-size:14px;font-weight:600;letter-spacing:.05em}
+.guess-section{margin-top:1rem}
+.pips{display:flex;gap:6px;justify-content:center;margin-bottom:.85rem}
+.pip{width:10px;height:10px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border-strong);transition:all .2s}
+.pip.correct{background:var(--green);border-color:var(--green)}
+.pip.wrong{background:var(--red);border-color:var(--red)}
+.guess-input-row{display:flex;gap:8px}
+#guess-input{flex:1;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:15px;padding:10px 14px;outline:none;transition:border .15s}
+#guess-input:focus{border-color:var(--accent)}
+#guess-input::placeholder{color:var(--text-dim)}
+.guess-btn{background:var(--accent);border:none;border-radius:var(--radius-sm);color:#000;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;padding:10px 20px;cursor:pointer}
+.hint-reveal{margin-top:.75rem;font-size:13px;color:var(--text-muted);line-height:1.7}
+.hint-reveal .hint-line{padding:3px 0}
+.hint-reveal strong{color:var(--text-primary)}
+.result-banner{margin-top:.75rem;border-radius:var(--radius-sm);overflow:hidden}
+.result-msg{padding:.7rem 1rem;font-size:14px;font-weight:500;text-align:center}
+.result-msg.success{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);color:#4ecf82}
+.result-msg.fail{background:rgba(224,60,49,.1);border:1px solid rgba(224,60,49,.25);color:#f07068}
+.post-game-btns{display:flex;gap:8px;margin-top:.75rem;justify-content:center}
+.pg-btn{background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:8px 16px;cursor:pointer}
+.pg-btn:hover{border-color:var(--accent);color:var(--accent)}
+.pg-btn.share-btn{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.archive-grid{display:flex;flex-direction:column;gap:8px}
+.archive-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 1rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border .15s}
+.archive-card:hover{border-color:var(--border-strong)}
+.archive-card-player{font-size:15px;font-weight:500;color:var(--text-primary)}
+.archive-card-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.archive-card-arrow{color:var(--text-dim);font-size:14px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+.stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem .5rem;text-align:center}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text-primary);line-height:1}
+.stat-label{font-size:11px;color:var(--text-muted);margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+.dist-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.dist-label{font-size:12px;color:var(--text-muted);width:50px;text-align:right;flex-shrink:0}
+.dist-bar-wrap{flex:1;background:var(--bg-elevated);border-radius:3px;height:16px;overflow:hidden}
+.dist-bar{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
+.dist-n{font-size:12px;color:var(--text-muted);width:24px;text-align:right;flex-shrink:0}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-size:13px;padding:.6rem 1.1rem;z-index:999;pointer-events:none;white-space:nowrap}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a href="https://missingfootball.com" class="home-link">← Home</a>
+    <div class="logo"><span class="logo-main">MISSING</span><span class="logo-gaffer">GAFFER</span></div>
+    <nav class="header-nav">
+      <button class="nav-btn active" data-view="game" onclick="setView('game')">Today</button>
+      <button class="nav-btn" data-view="archive" onclick="setView('archive')">Archive</button>
+      <button class="nav-btn" data-view="stats" onclick="setView('stats')">Stats</button>
+    </nav>
+  </div>
+</header>
+<div class="view active" id="view-game">
+  <div class="puzzle-meta">
+    <div class="puzzle-badge" id="puzzle-badge">PUZZLE #1</div>
+    <div class="puzzle-title" id="puzzle-title">Loading...</div>
+    <div class="puzzle-sub" id="puzzle-sub"></div>
+  </div>
+  <div class="timeline-card"><div class="timeline" id="timeline"></div></div>
+  <div class="guess-section" id="guess-section">
+    <div class="pips" id="pips">
+      <div class="pip" id="pip-0"></div>
+      <div class="pip" id="pip-1"></div>
+      <div class="pip" id="pip-2"></div>
+      <div class="pip" id="pip-3"></div>
+      <div class="pip" id="pip-4"></div>
+      <div class="pip" id="pip-5"></div>
+    </div>
+    <div class="guess-input-row">
+      <input type="text" id="guess-input" placeholder="Type the missing club…" autocomplete="off" autocorrect="off" spellcheck="false"/>
+      <button class="guess-btn" onclick="submitGuess()">Guess</button>
+    </div>
+    <div class="hint-reveal" id="hint-reveal"></div>
+    <div class="result-banner" id="result-banner"></div>
+  </div>
+  <div class="post-game-btns" id="post-game-btns" style="display:none">
+    <button class="pg-btn share-btn" onclick="shareResult()">Share 📋</button>
+    <button class="pg-btn" onclick="setView('archive')">Archive</button>
+  </div>
+</div>
+<div class="view" id="view-archive">
+  <div class="puzzle-badge" style="margin-bottom:1rem">All Puzzles</div>
+  <div class="archive-grid" id="archive-grid"></div>
+</div>
+<div class="view" id="view-stats">
+  <div class="puzzle-badge" style="margin-bottom:1rem">Your Stats</div>
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-num" id="stat-played">0</div><div class="stat-label">Played</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-wins">0</div><div class="stat-label">Won</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-pct">0%</div><div class="stat-label">Win %</div></div>
+  </div>
+  <div style="margin-bottom:.5rem;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Guess Distribution</div>
+  <div class="dist-row"><div class="dist-label">1st</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-1" style="width:0%"></div></div><div class="dist-n" id="dist-1-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">2nd</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-2" style="width:0%"></div></div><div class="dist-n" id="dist-2-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">3rd</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-3" style="width:0%"></div></div><div class="dist-n" id="dist-3-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">4th</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-4" style="width:0%"></div></div><div class="dist-n" id="dist-4-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">5th</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-5" style="width:0%"></div></div><div class="dist-n" id="dist-5-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">6th</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-6" style="width:0%"></div></div><div class="dist-n" id="dist-6-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">Miss</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-miss" style="width:0%"></div></div><div class="dist-n" id="dist-miss-n">0</div></div>
+</div>
+<script>
+const PUZZLES = [
+  {id:1,manager:"José Mourinho",nationality:"Portuguese",answer:"Inter Milan",acceptedAnswers:["inter milan","inter","internazionale","fc inter"],hints:["Serie A, Italian top flight","Milan — but not the red half","Mourinho won the treble here in 2009-10"],clubs:[{name:"Chelsea",years:"2004–07",league:"Premier League"},{name:"???",years:"2008–10",league:"Serie A"},{name:"Real Madrid",years:"2010–13",league:"La Liga"},{name:"Chelsea",years:"2013–15",league:"Premier League"},{name:"Man United",years:"2016–18",league:"Premier League"},{name:"Spurs",years:"2019–21",league:"Premier League"},{name:"Roma",years:"2021–24",league:"Serie A"}]},
+  {id:2,manager:"Pep Guardiola",nationality:"Spanish",answer:"Bayern Munich",acceptedAnswers:["bayern munich","bayern","fc bayern","fc bayern munich"],hints:["Bundesliga, German top flight","Bavaria, southern Germany","Guardiola won the Bundesliga all 3 seasons here"],clubs:[{name:"Barcelona B",years:"2007–08",league:"Segunda B"},{name:"Barcelona",years:"2008–12",league:"La Liga"},{name:"???",years:"2013–16",league:"Bundesliga"},{name:"Man City",years:"2016–",league:"Premier League"}]},
+  {id:3,manager:"Jürgen Klopp",nationality:"German",answer:"Borussia Dortmund",acceptedAnswers:["borussia dortmund","dortmund","bvb"],hints:["Bundesliga, German top flight","Ruhr valley, western Germany","Klopp won back-to-back Bundesliga titles here"],clubs:[{name:"Mainz",years:"2001–08",league:"Bundesliga"},{name:"???",years:"2008–15",league:"Bundesliga"},{name:"Liverpool",years:"2015–24",league:"Premier League"}]},
+  {id:4,manager:"Sir Alex Ferguson",nationality:"Scottish",answer:"Manchester United",acceptedAnswers:["manchester united","man united","man utd","united"],hints:["Premier League, English top flight","Greater Manchester, northwest England","Ferguson managed here for 26 years"],clubs:[{name:"East Stirling",years:"1974",league:"Scottish Division Two"},{name:"St Mirren",years:"1974–78",league:"Scottish First Division"},{name:"Aberdeen",years:"1978–86",league:"Scottish Premier Division"},{name:"???",years:"1986–2013",league:"Premier League"}]},
+  {id:5,manager:"Carlo Ancelotti",nationality:"Italian",answer:"AC Milan",acceptedAnswers:["ac milan","milan"],hints:["Serie A, Italian top flight","Milan, northern Italy","Ancelotti won two Champions Leagues here"],clubs:[{name:"Reggiana",years:"1995–96",league:"Serie B"},{name:"Parma",years:"1996–98",league:"Serie A"},{name:"Juventus",years:"1999–01",league:"Serie A"},{name:"???",years:"2001–09",league:"Serie A"},{name:"Chelsea",years:"2009–11",league:"Premier League"},{name:"PSG",years:"2011–13",league:"Ligue 1"},{name:"Real Madrid",years:"2013–15",league:"La Liga"},{name:"Napoli",years:"2018–19",league:"Serie A"},{name:"Everton",years:"2019–21",league:"Premier League"},{name:"Real Madrid",years:"2021–",league:"La Liga"}]},
+  {id:6,manager:"Arsène Wenger",nationality:"French",answer:"Arsenal",acceptedAnswers:["arsenal","arsenal fc"],hints:["Premier League, English top flight","North London","Wenger managed here for 22 years and never lost a league season"],clubs:[{name:"Nancy",years:"1984–87",league:"Ligue 1"},{name:"Monaco",years:"1987–94",league:"Ligue 1"},{name:"Nagoya Grampus",years:"1995–96",league:"J-League"},{name:"???",years:"1996–2018",league:"Premier League"}]},
+  {id:7,manager:"Rafael Benítez",nationality:"Spanish",answer:"Liverpool",acceptedAnswers:["liverpool","liverpool fc"],hints:["Premier League, English top flight","Merseyside, northwest England","Benítez won the Champions League here in 2005"],clubs:[{name:"Valladolid B",years:"1993–95",league:"Spanish lower leagues"},{name:"Osasuna",years:"1996–97",league:"Segunda"},{name:"Extremadura",years:"1997–99",league:"Segunda"},{name:"Valencia",years:"2001–04",league:"La Liga"},{name:"???",years:"2004–10",league:"Premier League"},{name:"Inter Milan",years:"2010",league:"Serie A"},{name:"Chelsea",years:"2012–13",league:"Premier League"},{name:"Napoli",years:"2013–15",league:"Serie A"},{name:"Real Madrid",years:"2015–16",league:"La Liga"},{name:"Newcastle",years:"2016–19",league:"Premier League"},{name:"Everton",years:"2021–22",league:"Premier League"}]},
+  {id:8,manager:"Claudio Ranieri",nationality:"Italian",answer:"Leicester City",acceptedAnswers:["leicester city","leicester","the foxes"],hints:["Premier League, English top flight","East Midlands, central England","Ranieri delivered one of football's greatest shocks here in 2016"],clubs:[{name:"Cagliari",years:"1988–91",league:"Serie A"},{name:"Napoli",years:"1991–93",league:"Serie A"},{name:"Fiorentina",years:"1993–97",league:"Serie A"},{name:"Valencia",years:"1997–99",league:"La Liga"},{name:"Atletico Madrid",years:"1999–2000",league:"La Liga"},{name:"Chelsea",years:"2000–04",league:"Premier League"},{name:"???",years:"2015–17",league:"Premier League"},{name:"Nantes",years:"2017–18",league:"Ligue 1"},{name:"Fulham",years:"2018–19",league:"Premier League"},{name:"Roma",years:"2019–21",league:"Serie A"}]},
+  {id:9,manager:"Antonio Conte",nationality:"Italian",answer:"Chelsea",acceptedAnswers:["chelsea","chelsea fc"],hints:["Premier League, English top flight","West London","Conte won the Premier League in his first season here"],clubs:[{name:"Arezzo",years:"2006–07",league:"Serie B"},{name:"Bari",years:"2007–09",league:"Serie B"},{name:"Atalanta",years:"2009–10",league:"Serie A"},{name:"Siena",years:"2010–11",league:"Serie B"},{name:"Juventus",years:"2011–14",league:"Serie A"},{name:"Italy",years:"2014–16",league:"International"},{name:"???",years:"2016–18",league:"Premier League"},{name:"Inter Milan",years:"2019–21",league:"Serie A"},{name:"Spurs",years:"2021–23",league:"Premier League"},{name:"Napoli",years:"2023–24",league:"Serie A"}]},
+  {id:10,manager:"Jürgen Klopp",nationality:"German",answer:"Borussia Dortmund",acceptedAnswers:["borussia dortmund","dortmund","bvb"],hints:["Bundesliga, German top flight","Ruhr valley, western Germany","Famous for gegenpressing — high energy pressing football"],clubs:[{name:"Mainz",years:"2001–08",league:"Bundesliga"},{name:"???",years:"2008–15",league:"Bundesliga"},{name:"Liverpool",years:"2015–24",league:"Premier League"}]},
+  {id:11,manager:"Bobby Robson",nationality:"English",answer:"Ipswich Town",acceptedAnswers:["ipswich town","ipswich"],hints:["First Division, English top flight","Suffolk, east England","Robson won the FA Cup and UEFA Cup here"],clubs:[{name:"Vancouver Whitecaps",years:"1967",league:"NASL"},{name:"???",years:"1969–82",league:"First Division"},{name:"England",years:"1982–90",league:"International"},{name:"PSV",years:"1990–92",league:"Eredivisie"},{name:"Sporting CP",years:"1992–93",league:"Primeira Liga"},{name:"Porto",years:"1994–96",league:"Primeira Liga"},{name:"Barcelona",years:"1996–97",league:"La Liga"},{name:"PSV",years:"1998–99",league:"Eredivisie"},{name:"Newcastle",years:"1999–2004",league:"Premier League"}]},
+  {id:12,manager:"Ottmar Hitzfeld",nationality:"German",answer:"Borussia Dortmund",acceptedAnswers:["borussia dortmund","dortmund","bvb"],hints:["Bundesliga, German top flight","Ruhr valley, western Germany","Hitzfeld won the Champions League here in 1997"],clubs:[{name:"VfB Stuttgart",years:"1991–92",league:"Bundesliga"},{name:"Grasshopper",years:"1992–94",league:"Swiss Super League"},{name:"???",years:"1994–97",league:"Bundesliga"},{name:"Bayern Munich",years:"1998–2004",league:"Bundesliga"},{name:"Switzerland",years:"2008–14",league:"International"}]},
+  {id:13,manager:"Didier Deschamps",nationality:"French",answer:"Marseille",acceptedAnswers:["marseille","olympique de marseille","om"],hints:["Ligue 1, French top flight","Mediterranean port city, southern France","Deschamps managed his former club here before taking the France job"],clubs:[{name:"Monaco",years:"2001–05",league:"Ligue 1"},{name:"Juventus",years:"2006–07",league:"Serie A"},{name:"???",years:"2009–12",league:"Ligue 1"},{name:"France",years:"2012–",league:"International"}]},
+  {id:14,manager:"Zinedine Zidane",nationality:"French",answer:"Real Madrid",acceptedAnswers:["real madrid","real madrid cf"],hints:["La Liga, Spanish top flight","Spanish capital city","Zidane won three consecutive Champions Leagues here as manager"],clubs:[{name:"Real Madrid B",years:"2014–16",league:"Segunda B"},{name:"???",years:"2016–18",league:"La Liga"},{name:"Real Madrid",years:"2019–21",league:"La Liga"}]},
+  {id:15,manager:"Diego Simeone",nationality:"Argentine",answer:"Atletico Madrid",acceptedAnswers:["atletico madrid","atletico","atlético madrid","atlético"],hints:["La Liga, Spanish top flight","Spanish capital city — the other side","Simeone has managed here since 2011 — his longest stint"],clubs:[{name:"Racing Club",years:"2006–07",league:"Argentine Primera"},{name:"River Plate",years:"2008–09",league:"Argentine Primera"},{name:"San Lorenzo",years:"2009",league:"Argentine Primera"},{name:"Catania",years:"2009–11",league:"Serie A"},{name:"Racing Club",years:"2011",league:"Argentine Primera"},{name:"???",years:"2011–",league:"La Liga"}]},
+  {id:16,manager:"Brendan Rodgers",nationality:"Northern Irish",answer:"Liverpool",acceptedAnswers:["liverpool","liverpool fc"],hints:["Premier League, English top flight","Merseyside, northwest England","Rodgers nearly won the title here in 2013–14"],clubs:[{name:"Watford",years:"2008–09",league:"Championship"},{name:"Reading",years:"2009",league:"Championship"},{name:"Swansea",years:"2010–12",league:"Premier League"},{name:"???",years:"2012–15",league:"Premier League"},{name:"Celtic",years:"2016–19",league:"Scottish Premiership"},{name:"Leicester",years:"2019–23",league:"Premier League"}]},
+  {id:17,manager:"Harry Redknapp",nationality:"English",answer:"Tottenham Hotspur",acceptedAnswers:["tottenham hotspur","spurs","tottenham"],hints:["Premier League, English top flight","North London","Redknapp took them to a Champions League semi-final"],clubs:[{name:"Bournemouth",years:"1983–92",league:"Third Division"},{name:"West Ham",years:"1994–2001",league:"Premier League"},{name:"Portsmouth",years:"2002–04",league:"Premier League"},{name:"Southampton",years:"2004–05",league:"Premier League"},{name:"Portsmouth",years:"2005–08",league:"Premier League"},{name:"???",years:"2008–12",league:"Premier League"},{name:"QPR",years:"2012–13",league:"Premier League"},{name:"Birmingham",years:"2016–17",league:"Championship"}]},
+  {id:18,manager:"Sam Allardyce",nationality:"English",answer:"West Ham United",acceptedAnswers:["west ham","west ham united"],hints:["Premier League, English top flight","East London","Big Sam kept them up and reached an FA Cup final here"],clubs:[{name:"Notts County",years:"1997–99",league:"Third Division"},{name:"Bolton",years:"1999–2007",league:"Premier League"},{name:"Newcastle",years:"2007–08",league:"Premier League"},{name:"Blackburn",years:"2008–10",league:"Premier League"},{name:"???",years:"2011–15",league:"Premier League"},{name:"Sunderland",years:"2015–16",league:"Premier League"},{name:"Crystal Palace",years:"2016",league:"Premier League"},{name:"Everton",years:"2017–18",league:"Premier League"}]},
+  {id:19,manager:"Gérard Houllier",nationality:"French",answer:"Liverpool",acceptedAnswers:["liverpool","liverpool fc"],hints:["Premier League, English top flight","Merseyside, northwest England","Houllier won a cup treble here in 2000–01"],clubs:[{name:"Lens",years:"1982–85",league:"Ligue 1"},{name:"Paris Saint-Germain",years:"1985–88",league:"Ligue 1"},{name:"France",years:"1992–93",league:"International"},{name:"???",years:"1998–2004",league:"Premier League"},{name:"Lyon",years:"2005–07",league:"Ligue 1"},{name:"Aston Villa",years:"2010–11",league:"Premier League"}]},
+  {id:20,manager:"Martin O'Neill",nationality:"Northern Irish",answer:"Leicester City",acceptedAnswers:["leicester city","leicester"],hints:["Premier League, English top flight","East Midlands, central England","O'Neill took them to two League Cup finals here"],clubs:[{name:"Grantham Town",years:"1987–89",league:"Non-league"},{name:"Shepshed Charterhouse",years:"1989–90",league:"Non-league"},{name:"Wycombe Wanderers",years:"1990–95",league:"Conference"},{name:"Norwich City",years:"1995",league:"Premier League"},{name:"???",years:"1995–2000",league:"Premier League"},{name:"Celtic",years:"2000–05",league:"Scottish Premiership"},{name:"Aston Villa",years:"2006–10",league:"Premier League"},{name:"Sunderland",years:"2011–13",league:"Premier League"}]},
+  {id:21,manager:"Howard Kendall",nationality:"English",answer:"Athletic Bilbao",acceptedAnswers:["athletic bilbao","atletico bilbao","athletic club"],hints:["La Liga, Spanish top flight","Basque Country, northern Spain","Kendall was one of the first English managers in La Liga"],clubs:[{name:"Blackpool",years:"1979–81",league:"Third Division"},{name:"Everton",years:"1981–87",league:"First Division"},{name:"???",years:"1987–89",league:"La Liga"},{name:"Everton",years:"1990–93",league:"First Division"},{name:"Notts County",years:"1993–94",league:"First Division"},{name:"Sheffield United",years:"1995",league:"First Division"},{name:"Everton",years:"1997–98",league:"Premier League"}]},
+  {id:22,manager:"Giovanni Trapattoni",nationality:"Italian",answer:"Bayern Munich",acceptedAnswers:["bayern munich","bayern","fc bayern"],hints:["Bundesliga, German top flight","Bavaria, southern Germany","Trapattoni had a turbulent time here — famous for his angry press conference"],clubs:[{name:"Juventus",years:"1976–86",league:"Serie A"},{name:"Inter Milan",years:"1986–91",league:"Serie A"},{name:"Fiorentina",years:"1991–93",league:"Serie A"},{name:"???",years:"1994–95",league:"Bundesliga"},{name:"Cagliari",years:"1995–96",league:"Serie A"},{name:"Atletico Madrid",years:"1996–97",league:"La Liga"},{name:"Juventus",years:"1998–2000",league:"Serie A"},{name:"Fiorentina",years:"2000–01",league:"Serie A"},{name:"Benfica",years:"2004–05",league:"Primeira Liga"},{name:"Ireland",years:"2008–13",league:"International"}]},
+  {id:23,manager:"Fabio Capello",nationality:"Italian",answer:"Lazio",acceptedAnswers:["lazio","ss lazio"],hints:["Serie A, Italian top flight","Rome — but not the yellow and red half","A controversial single season that ended in relegation play-offs"],clubs:[{name:"Roma",years:"1991–96",league:"Serie A"},{name:"Real Madrid",years:"1996–97",league:"La Liga"},{name:"Roma",years:"1999–2004",league:"Serie A"},{name:"???",years:"2004–06",league:"Serie A"},{name:"Juventus",years:"2004–06",league:"Serie A"},{name:"England",years:"2008–12",league:"International"},{name:"Russia",years:"2012–15",league:"International"}]},
+  {id:24,manager:"Sven-Göran Eriksson",nationality:"Swedish",answer:"England",acceptedAnswers:["england","england national team"],hints:["International football, European nation","Three Lions, home at Wembley","Eriksson was the first foreign manager of this national team"],clubs:[{name:"IFK Gothenburg",years:"1979–82",league:"Allsvenskan"},{name:"Benfica",years:"1982–84",league:"Primeira Liga"},{name:"Roma",years:"1984–87",league:"Serie A"},{name:"Fiorentina",years:"1987–89",league:"Serie A"},{name:"Benfica",years:"1989–92",league:"Primeira Liga"},{name:"Sampdoria",years:"1992–97",league:"Serie A"},{name:"Lazio",years:"1997–2001",league:"Serie A"},{name:"???",years:"2001–06",league:"International"},{name:"Man City",years:"2007–08",league:"Premier League"}]},
+  {id:25,manager:"Mark Hughes",nationality:"Welsh",answer:"Fulham",acceptedAnswers:["fulham","fulham fc"],hints:["Premier League, English top flight","West London, by the Thames","Hughes kept them up on the final day of the season"],clubs:[{name:"Wales",years:"1999–2004",league:"International"},{name:"Blackburn",years:"2004–08",league:"Premier League"},{name:"Man City",years:"2008–09",league:"Premier League"},{name:"???",years:"2010–11",league:"Premier League"},{name:"Queens Park Rangers",years:"2011–12",league:"Premier League"},{name:"Stoke City",years:"2013–18",league:"Premier League"},{name:"Southampton",years:"2018",league:"Premier League"}]},
+  {id:26,manager:"Ronald Koeman",nationality:"Dutch",answer:"Feyenoord",acceptedAnswers:["feyenoord","feyenoord rotterdam"],hints:["Eredivisie, Dutch top flight","Rotterdam, second city of the Netherlands","Koeman managed his home country's most successful club"],clubs:[{name:"Valencia",years:"2007–09",league:"La Liga"},{name:"AZ Alkmaar",years:"2009–12",league:"Eredivisie"},{name:"???",years:"2011–14",league:"Eredivisie"},{name:"Southampton",years:"2014–16",league:"Premier League"},{name:"Everton",years:"2016–17",league:"Premier League"},{name:"Barcelona",years:"2020–21",league:"La Liga"},{name:"Netherlands",years:"2018–20",league:"International"},{name:"Netherlands",years:"2023–",league:"International"}]},
+  {id:27,manager:"Steve McClaren",nationality:"English",answer:"England",acceptedAnswers:["england","england national team"],hints:["International football, European nation","Three Lions — succeeded Eriksson","McClaren's reign ended in famous failure in the rain at Wembley"],clubs:[{name:"Derby County",years:"2003–04",league:"Championship"},{name:"Middlesbrough",years:"2001–06",league:"Premier League"},{name:"???",years:"2006–07",league:"International"},{name:"Wolfsburg",years:"2008–10",league:"Bundesliga"},{name:"FC Twente",years:"2010–13",league:"Eredivisie"},{name:"Derby County",years:"2013–15",league:"Championship"},{name:"Newcastle",years:"2015–16",league:"Premier League"}]},
+  {id:28,manager:"Graeme Souness",nationality:"Scottish",answer:"Blackburn Rovers",acceptedAnswers:["blackburn rovers","blackburn"],hints:["Premier League, English top flight","Lancashire, northwest England","Souness spent big here but couldn't recapture the Shearer glory days"],clubs:[{name:"Rangers",years:"1986–91",league:"Scottish Premier Division"},{name:"Galatasaray",years:"1995–96",league:"Süper Lig"},{name:"Southampton",years:"1996–97",league:"Premier League"},{name:"Torino",years:"1997–98",league:"Serie A"},{name:"Benfica",years:"1997–99",league:"Primeira Liga"},{name:"???",years:"2000–04",league:"Premier League"},{name:"Newcastle",years:"2004–06",league:"Premier League"}]},
+  {id:29,manager:"Kenny Dalglish",nationality:"Scottish",answer:"Blackburn Rovers",acceptedAnswers:["blackburn rovers","blackburn"],hints:["Premier League, English top flight","Lancashire, northwest England","Dalglish won the Premier League title here in its third season"],clubs:[{name:"Liverpool",years:"1985–91",league:"First Division"},{name:"???",years:"1991–95",league:"Premier League"},{name:"Newcastle",years:"1997–98",league:"Premier League"},{name:"Celtic",years:"1999–2000",league:"Scottish Premiership"},{name:"Liverpool",years:"2011–12",league:"Premier League"}]},
+  {id:30,manager:"Bruce Rioch",nationality:"Scottish",answer:"Arsenal",acceptedAnswers:["arsenal","arsenal fc"],hints:["Premier League, English top flight","North London","Rioch managed here for just one season, signing Bergkamp"],clubs:[{name:"Torquay United",years:"1982–84",league:"Fourth Division"},{name:"Middlesbrough",years:"1986–90",league:"Second Division"},{name:"Millwall",years:"1990–92",league:"First Division"},{name:"Bolton",years:"1992–95",league:"First Division"},{name:"???",years:"1995–96",league:"Premier League"},{name:"Norwich City",years:"1998–2000",league:"First Division"}]},
+  {id:31,manager:"Mauricio Pochettino",nationality:"Argentine",answer:"Tottenham Hotspur",acceptedAnswers:["tottenham hotspur","spurs","tottenham"],hints:["Premier League, English top flight","North London","Pochettino took them to the Champions League final in 2019"],clubs:[{name:"Espanyol",years:"2009–12",league:"La Liga"},{name:"Southampton",years:"2013–14",league:"Premier League"},{name:"???",years:"2014–19",league:"Premier League"},{name:"PSG",years:"2021–23",league:"Ligue 1"},{name:"Chelsea",years:"2023–24",league:"Premier League"}]},
+  {id:32,manager:"Frank Lampard",nationality:"English",answer:"Chelsea",acceptedAnswers:["chelsea","chelsea fc"],hints:["Premier League, English top flight","West London","Lampard managed the club where he is an all-time legend"],clubs:[{name:"Derby County",years:"2018–19",league:"Championship"},{name:"???",years:"2019–21",league:"Premier League"},{name:"Everton",years:"2022–23",league:"Premier League"},{name:"Chelsea",years:"2023–24",league:"Premier League"}]},
+  {id:33,manager:"Steven Gerrard",nationality:"English",answer:"Aston Villa",acceptedAnswers:["aston villa","villa"],hints:["Premier League, English top flight","Birmingham, West Midlands","Gerrard was sacked here after a poor run of form in 2022"],clubs:[{name:"Rangers",years:"2018–21",league:"Scottish Premiership"},{name:"???",years:"2021–22",league:"Premier League"},{name:"Al-Ettifaq",years:"2023–24",league:"Saudi Pro League"}]},
+  {id:34,manager:"Ole Gunnar Solskjær",nationality:"Norwegian",answer:"Manchester United",acceptedAnswers:["manchester united","man united","man utd"],hints:["Premier League, English top flight","Greater Manchester","Solskjær returned as manager to the club where he scored THAT goal"],clubs:[{name:"Molde",years:"2011–14",league:"Eliteserien"},{name:"Cardiff City",years:"2014",league:"Premier League"},{name:"Molde",years:"2015–18",league:"Eliteserien"},{name:"???",years:"2018–21",league:"Premier League"}]},
+  {id:35,manager:"Nuno Espírito Santo",nationality:"Portuguese",answer:"Wolverhampton Wanderers",acceptedAnswers:["wolverhampton wanderers","wolves","wolverhampton"],hints:["Premier League, English top flight","West Midlands","Nuno took them from the Championship to seventh in the Premier League"],clubs:[{name:"Rio Ave",years:"2012–14",league:"Primeira Liga"},{name:"Valencia",years:"2014–15",league:"La Liga"},{name:"Porto",years:"2015–17",league:"Primeira Liga"},{name:"???",years:"2017–21",league:"Premier League"},{name:"Spurs",years:"2021",league:"Premier League"},{name:"Nottingham Forest",years:"2022–23",league:"Premier League"}]},
+  {id:36,manager:"David Moyes",nationality:"Scottish",answer:"Manchester United",acceptedAnswers:["manchester united","man united","man utd"],hints:["Premier League, English top flight","Greater Manchester","Moyes took the most difficult job in football — replacing Sir Alex Ferguson"],clubs:[{name:"Preston North End",years:"1998–2002",league:"First Division"},{name:"Everton",years:"2002–13",league:"Premier League"},{name:"???",years:"2013–14",league:"Premier League"},{name:"Real Sociedad",years:"2014–15",league:"La Liga"},{name:"Sunderland",years:"2016–17",league:"Premier League"},{name:"West Ham",years:"2017–24",league:"Premier League"}]},
+  {id:37,manager:"Avram Grant",nationality:"Israeli",answer:"Portsmouth",acceptedAnswers:["portsmouth","portsmouth fc"],hints:["Premier League, English top flight","South coast of England","Grant kept them up despite a points deduction — briefly"],clubs:[{name:"Maccabi Tel Aviv",years:"various",league:"Israeli Premier League"},{name:"Chelsea",years:"2007–08",league:"Premier League"},{name:"???",years:"2009–10",league:"Premier League"},{name:"West Ham",years:"2010–11",league:"Premier League"}]},
+  {id:38,manager:"Luiz Felipe Scolari",nationality:"Brazilian",answer:"Chelsea",acceptedAnswers:["chelsea","chelsea fc"],hints:["Premier League, English top flight","West London","Big Phil lasted just seven months here"],clubs:[{name:"Various Brazilian clubs",years:"1982–2001",league:"Brazilian football"},{name:"Portugal",years:"2002–08",league:"International"},{name:"???",years:"2008–09",league:"Premier League"},{name:"Palmeiras",years:"2010–12",league:"Brasileirão"},{name:"Brazil",years:"2012–14",league:"International"}]},
+  {id:39,manager:"Walter Smith",nationality:"Scottish",answer:"Everton",acceptedAnswers:["everton","everton fc"],hints:["Premier League, English top flight","Merseyside — the blue half","Smith steadied the ship here before returning to Rangers"],clubs:[{name:"Dundee United",years:"1982–86",league:"Scottish Premier Division (assistant)"},{name:"Rangers",years:"1991–98",league:"Scottish Premier Division"},{name:"???",years:"1998–2002",league:"Premier League"},{name:"Scotland",years:"2004–07",league:"International"},{name:"Rangers",years:"2007–11",league:"Scottish Premier League"}]},
+  {id:40,manager:"Unai Emery",nationality:"Spanish",answer:"Arsenal",acceptedAnswers:["arsenal","arsenal fc"],hints:["Premier League, English top flight","North London","Emery replaced Wenger but lasted just 18 months"],clubs:[{name:"Almería",years:"2008–12",league:"La Liga"},{name:"Valencia",years:"2008–12",league:"La Liga"},{name:"Sevilla",years:"2012–16",league:"La Liga"},{name:"PSG",years:"2016–18",league:"Ligue 1"},{name:"???",years:"2018–19",league:"Premier League"},{name:"Villarreal",years:"2020–22",league:"La Liga"},{name:"Aston Villa",years:"2022–",league:"Premier League"}]}
+];
+
+let state={puzzleIndex:0,attempts:0,maxAttempts:6,solved:false,failed:false,hintsRevealed:0};
+let puzzle;
+function loadStorage(){try{const r=localStorage.getItem('missinggaffer_v1');return r?JSON.parse(r):{stats:defaultStats(),sessions:{}};}catch{return{stats:defaultStats(),sessions:{}};}}
+function saveStorage(d){try{localStorage.setItem('missinggaffer_v1',JSON.stringify(d));}catch{}}
+function defaultStats(){return{played:0,wins:0,streak:0,bestStreak:0,dist:{1:0,2:0,3:0,4:0,5:0,6:0,miss:0}};}
+let storage=loadStorage();
+function getDailyPuzzleIndex(){const start=new Date("2025-01-01");const dayNum=Math.floor((new Date()-start)/86400000);return dayNum%PUZZLES.length;}
+function normalise(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s]/g,"").trim();}
+function checkGuess(guess,puz){const g=normalise(guess);return puz.acceptedAnswers.some(a=>normalise(a)===g);}
+document.addEventListener('DOMContentLoaded',()=>{state.puzzleIndex=getDailyPuzzleIndex();loadPuzzle(state.puzzleIndex);renderArchive();renderStats();document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitGuess();});});
+function loadPuzzle(idx){
+  puzzle=PUZZLES[idx];state.puzzleIndex=idx;state.attempts=0;state.solved=false;state.failed=false;state.hintsRevealed=0;
+  document.getElementById('puzzle-badge').textContent='PUZZLE #'+puzzle.id;
+  document.getElementById('puzzle-title').textContent=puzzle.manager;
+  document.getElementById('puzzle-sub').textContent=puzzle.nationality+' · Guess the missing club';
+  renderTimeline(puzzle,false);resetPips();
+  document.getElementById('result-banner').innerHTML='';document.getElementById('hint-reveal').innerHTML='';
+  document.getElementById('post-game-btns').style.display='none';document.getElementById('guess-section').style.display='block';document.getElementById('guess-input').value='';
+  const saved=storage.sessions['p'+idx];
+  if(saved){
+    state.attempts=saved.attempts;state.solved=saved.solved;state.failed=saved.failed;state.hintsRevealed=saved.hintsRevealed||0;
+    renderHints();
+    [0,1,2,3,4,5].forEach((pip,i)=>{const el=document.getElementById('pip-'+i);if(el&&saved.pips&&saved.pips[i])el.classList.add(saved.pips[i]);});
+    if(state.solved||state.failed)showEndState(state.solved,puzzle);
+    renderTimeline(puzzle,state.solved||state.failed);
+  }
+}
+function renderTimeline(puz,reveal){
+  const tl=document.getElementById('timeline');tl.innerHTML='';
+  puz.clubs.forEach((club,i)=>{
+    const isMissing=club.name==='???';
+    const row=document.createElement('div');row.className='club-row';
+    const num=document.createElement('div');num.className='club-num';num.textContent=i+1;
+    const dot=document.createElement('div');dot.className='club-dot '+(isMissing?'missing':'known');
+    const info=document.createElement('div');info.className='club-info';
+    if(isMissing&&!reveal){info.innerHTML='<div class="missing-slot">???</div>';}
+    else{
+      const dn=isMissing&&reveal?'<span style="color:'+(state.solved?'var(--green)':'var(--red)')+'">'+puz.answer+'</span>':club.name;
+      const leagueSpan=club.league?' · <span class="club-league">'+club.league+'</span>':'';
+      info.innerHTML='<div class="club-name">'+dn+'</div><div class="club-years">'+club.years+leagueSpan+'</div>';
+    }
+    row.appendChild(num);row.appendChild(dot);row.appendChild(info);tl.appendChild(row);
+  });
+}
+function renderHints(){
+  const puz=PUZZLES[state.puzzleIndex];
+  const el=document.getElementById('hint-reveal');if(!el)return;
+  let html='';
+  for(let i=0;i<state.hintsRevealed;i++){html+='<div class="hint-line">💡 '+puz.hints[i]+'</div>';}
+  el.innerHTML=html;
+}
+function submitGuess(){
+  if(state.solved||state.failed)return;
+  const input=document.getElementById('guess-input');const val=input.value.trim();if(!val){input.focus();return;}
+  const puz=PUZZLES[state.puzzleIndex];const correct=checkGuess(val,puz);const pip=document.getElementById('pip-'+state.attempts);
+  if(correct){
+    pip.classList.add('correct');state.solved=true;recordResult(true,state.attempts+1);showEndState(true,puz);renderTimeline(puz,true);
+  } else {
+    pip.classList.add('wrong');state.attempts++;
+    if(state.hintsRevealed<puz.hints.length&&state.hintsRevealed<3){state.hintsRevealed++;renderHints();}
+    if(state.attempts>=state.maxAttempts){state.failed=true;recordResult(false,0);showEndState(false,puz);renderTimeline(puz,true);}
+    else{const remaining=state.maxAttempts-state.attempts;document.getElementById('result-banner').innerHTML='<div class="result-msg fail">✗ Not quite — '+remaining+' attempt'+(remaining===1?'':'s')+' left</div>';}
+  }
+  input.value='';saveSession();
+}
+function showEndState(won,puz){
+  const banner=document.getElementById('result-banner');
+  if(won){banner.innerHTML='<div class="result-msg success">✓ Correct! The missing club was <strong>'+puz.answer+'</strong></div>';}
+  else{banner.innerHTML='<div class="result-msg fail">The missing club was <strong>'+puz.answer+'</strong></div>';}
+  document.getElementById('guess-section').querySelector('.guess-input-row').style.display='none';
+  document.getElementById('post-game-btns').style.display='flex';
+}
+function resetPips(){[0,1,2,3,4,5].forEach(i=>{const p=document.getElementById('pip-'+i);if(p)p.className='pip';});}
+function getPipStates(){return[0,1,2,3,4,5].map(i=>{const p=document.getElementById('pip-'+i);if(p){if(p.classList.contains('correct'))return'correct';if(p.classList.contains('wrong'))return'wrong';}return null;});}
+function saveSession(extra){const key='p'+state.puzzleIndex;storage.sessions[key]=Object.assign(storage.sessions[key]||{},{attempts:state.attempts,solved:state.solved,failed:state.failed,hintsRevealed:state.hintsRevealed},extra);if(!extra?.pips)storage.sessions[key].pips=getPipStates();saveStorage(storage);}
+function recordResult(won,guessNum){const s=storage.stats;s.played++;if(won){s.wins++;s.streak++;if(s.streak>s.bestStreak)s.bestStreak=s.streak;s.dist[guessNum]=(s.dist[guessNum]||0)+1;}else{s.streak=0;s.dist.miss=(s.dist.miss||0)+1;}saveStorage(storage);}
+function renderStats(){const s=storage.stats;document.getElementById('stat-played').textContent=s.played;document.getElementById('stat-wins').textContent=s.wins;document.getElementById('stat-streak').textContent=s.streak;document.getElementById('stat-pct').textContent=s.played?Math.round(s.wins/s.played*100)+'%':'0%';const max=Math.max(1,s.dist[1]||0,s.dist[2]||0,s.dist[3]||0,s.dist[4]||0,s.dist[5]||0,s.dist[6]||0,s.dist.miss||0);['1','2','3','4','5','6','miss'].forEach(k=>{const v=s.dist[k]||0;const bar=document.getElementById('dist-'+k);const num=document.getElementById('dist-'+k+'-n');if(bar)bar.style.width=(v/max*100)+'%';if(num)num.textContent=v;});}
+function renderArchive(){const grid=document.getElementById('archive-grid');grid.innerHTML='';PUZZLES.forEach((puz,idx)=>{const card=document.createElement('div');card.className='archive-card';const sess=storage.sessions['p'+idx];const status=sess?.solved?'✓':sess?.failed?'✗':'';card.innerHTML='<div><div class="archive-card-player">'+(status?status+' ':'')+puz.manager+'</div><div class="archive-card-sub">'+puz.nationality+'</div></div><div class="archive-card-arrow">›</div>';card.addEventListener('click',()=>{loadPuzzle(idx);setView('game');});grid.appendChild(card);});}
+function showShareOptions(text){if(navigator.share&&/Mobi|Android/i.test(navigator.userAgent)){navigator.share({text}).catch(()=>copyToClipboard(text));return;}copyToClipboard(text);const waUrl='https://wa.me/?text='+encodeURIComponent(text);const existing=document.querySelector('.toast');if(existing)existing.remove();const t=document.createElement('div');t.className='toast';t.style.cssText='display:flex;align-items:center;gap:.75rem;';t.innerHTML='<span>Copied!</span><a href="'+waUrl+'" target="_blank" style="color:#25D366;font-weight:600;text-decoration:none;font-size:13px;">WhatsApp ↗</a>';document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
+function shareResult(){const icons=getPipStates().filter(p=>p!==null).map(p=>p==='correct'?'🟩':'🟥').join('');const solved=state.solved;const line1='🧥 Missing Gaffer #'+puzzle.id;const line2=solved?icons+'  Solved in '+(state.attempts)+'!':icons+'  Not today!';const line3='missingfootball.com/missing-gaffer';const text=line1+'\n'+line2+'\n'+line3;showShareOptions(text);}
+function copyToClipboard(text){navigator.clipboard.writeText(text).catch(()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});}
+function setView(view){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('view-'+view).classList.add('active');document.querySelector('[data-view="'+view+'"]').classList.add('active');if(view==='stats')renderStats();if(view==='archive')renderArchive();}
+</script>
+</body>
+</html>
