@@ -263,7 +263,7 @@ function submitGuess(){
     pip.classList.add('correct');state.solved=true;recordResult(true,state.attempts+1);showEndState(true,puz);renderTimeline(puz,true);
   } else {
     pip.classList.add('wrong');state.attempts++;
-    if(state.attempts===2&&state.hintsRevealed===0){state.hintsRevealed=1;renderHints();document.querySelector('.hint-reveal').style.display='block';}
+    if(state.attempts===2&&state.hintsRevealed===0){state.hintsRevealed=1;renderHints();document.getElementById('hint-reveal').style.display='block';}
     if(state.attempts>=state.maxAttempts){state.failed=true;recordResult(false,0);showEndState(false,puz);renderTimeline(puz,true);}
     else{const remaining=state.maxAttempts-state.attempts;document.getElementById('result-banner').innerHTML='<div class="result-msg fail">✗ Not quite — '+remaining+' attempt'+(remaining===1?'':'s')+' left</div>';}
   }
