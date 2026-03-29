@@ -110,9 +110,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
       <div class="pip" id="pip-0"></div>
       <div class="pip" id="pip-1"></div>
       <div class="pip" id="pip-2"></div>
-      <div class="pip" id="pip-3"></div>
-      <div class="pip" id="pip-4"></div>
-      <div class="pip" id="pip-5"></div>
     </div>
     <div class="guess-input-row">
       <input type="text" id="guess-input" placeholder="Type the missing club…" autocomplete="off" autocorrect="off" spellcheck="false"/>
@@ -142,9 +139,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
   <div class="dist-row"><div class="dist-label">1st</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-1" style="width:0%"></div></div><div class="dist-n" id="dist-1-n">0</div></div>
   <div class="dist-row"><div class="dist-label">2nd</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-2" style="width:0%"></div></div><div class="dist-n" id="dist-2-n">0</div></div>
   <div class="dist-row"><div class="dist-label">3rd</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-3" style="width:0%"></div></div><div class="dist-n" id="dist-3-n">0</div></div>
-  <div class="dist-row"><div class="dist-label">4th</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-4" style="width:0%"></div></div><div class="dist-n" id="dist-4-n">0</div></div>
-  <div class="dist-row"><div class="dist-label">5th</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-5" style="width:0%"></div></div><div class="dist-n" id="dist-5-n">0</div></div>
-  <div class="dist-row"><div class="dist-label">6th</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-6" style="width:0%"></div></div><div class="dist-n" id="dist-6-n">0</div></div>
   <div class="dist-row"><div class="dist-label">Miss</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-miss" style="width:0%"></div></div><div class="dist-n" id="dist-miss-n">0</div></div>
 </div>
 <script>
@@ -211,11 +205,11 @@ const PUZZLES = [
   {id:60,manager:"Roberto Martínez",nationality:"Spanish",answer:"Everton",acceptedAnswers:["everton","everton fc"],hints:["Premier League, English top flight","Merseyside — the blue half","Martínez won the FA Cup with Wigan then took this job"],clubs:[{name:"Swansea City",years:"2007–09",league:"Championship"},{name:"Wigan Athletic",years:"2009–13",league:"Premier League"},{name:"???",years:"2013–16",league:"Premier League"},{name:"Belgium",years:"2016–23",league:"International"},{name:"Portugal",years:"2023–",league:"International"}]}
 ];
 
-let state={puzzleIndex:0,attempts:0,maxAttempts:6,solved:false,failed:false,hintsRevealed:0};
+let state={puzzleIndex:0,attempts:0,maxAttempts:3,solved:false,failed:false,hintsRevealed:0};
 let puzzle;
 function loadStorage(){try{const r=localStorage.getItem('missinggaffer_v1');return r?JSON.parse(r):{stats:defaultStats(),sessions:{}};}catch{return{stats:defaultStats(),sessions:{}};}}
 function saveStorage(d){try{localStorage.setItem('missinggaffer_v1',JSON.stringify(d));}catch{}}
-function defaultStats(){return{played:0,wins:0,streak:0,bestStreak:0,dist:{1:0,2:0,3:0,4:0,5:0,6:0,miss:0}};}
+function defaultStats(){return{played:0,wins:0,streak:0,bestStreak:0,dist:{1:0,2:0,3:0,miss:0}};}
 let storage=loadStorage();
 function getDayNum(){return Math.floor((new Date()-new Date('2026-04-01'))/86400000);}function getDailyPuzzleIndex(){const d=getDayNum();return d<0?0:d%PUZZLES.length;}
 function normalise(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s]/g,"").trim();}
@@ -233,7 +227,7 @@ function loadPuzzle(idx){
   if(saved){
     state.attempts=saved.attempts;state.solved=saved.solved;state.failed=saved.failed;state.hintsRevealed=saved.hintsRevealed||0;
     renderHints();
-    [0,1,2,3,4,5].forEach((pip,i)=>{const el=document.getElementById('pip-'+i);if(el&&saved.pips&&saved.pips[i])el.classList.add(saved.pips[i]);});
+    [0,1,2].forEach((pip,i)=>{const el=document.getElementById('pip-'+i);if(el&&saved.pips&&saved.pips[i])el.classList.add(saved.pips[i]);});
     if(state.solved||state.failed)showEndState(state.solved,puzzle);
     renderTimeline(puzzle,state.solved||state.failed);
   }
@@ -258,9 +252,8 @@ function renderTimeline(puz,reveal){
 function renderHints(){
   const puz=PUZZLES[state.puzzleIndex];
   const el=document.getElementById('hint-reveal');if(!el)return;
-  let html='';
-  for(let i=0;i<state.hintsRevealed;i++){html+='<div class="hint-line">💡 '+puz.hints[i]+'</div>';}
-  el.innerHTML=html;
+  if(state.hintsRevealed>0){el.innerHTML='<div class="hint-line">💡 <strong>Clue:</strong> '+puz.hints[0]+'</div>';}
+  else{el.innerHTML='';}
 }
 function submitGuess(){
   if(state.solved||state.failed)return;
@@ -270,7 +263,7 @@ function submitGuess(){
     pip.classList.add('correct');state.solved=true;recordResult(true,state.attempts+1);showEndState(true,puz);renderTimeline(puz,true);
   } else {
     pip.classList.add('wrong');state.attempts++;
-    if(state.hintsRevealed<puz.hints.length&&state.hintsRevealed<3){state.hintsRevealed++;renderHints();}
+    if(state.attempts===2&&state.hintsRevealed===0){state.hintsRevealed=1;renderHints();}
     if(state.attempts>=state.maxAttempts){state.failed=true;recordResult(false,0);showEndState(false,puz);renderTimeline(puz,true);}
     else{const remaining=state.maxAttempts-state.attempts;document.getElementById('result-banner').innerHTML='<div class="result-msg fail">✗ Not quite — '+remaining+' attempt'+(remaining===1?'':'s')+' left</div>';}
   }
@@ -283,11 +276,11 @@ function showEndState(won,puz){
   document.getElementById('guess-section').querySelector('.guess-input-row').style.display='none';
   document.getElementById('post-game-btns').style.display='flex';
 }
-function resetPips(){[0,1,2,3,4,5].forEach(i=>{const p=document.getElementById('pip-'+i);if(p)p.className='pip';});}
-function getPipStates(){return[0,1,2,3,4,5].map(i=>{const p=document.getElementById('pip-'+i);if(p){if(p.classList.contains('correct'))return'correct';if(p.classList.contains('wrong'))return'wrong';}return null;});}
+function resetPips(){[0,1,2].forEach(i=>{const p=document.getElementById('pip-'+i);if(p)p.className='pip';});}
+function getPipStates(){return[0,1,2].map(i=>{const p=document.getElementById('pip-'+i);if(p){if(p.classList.contains('correct'))return'correct';if(p.classList.contains('wrong'))return'wrong';}return null;});}
 function saveSession(extra){const key='p'+state.puzzleIndex;storage.sessions[key]=Object.assign(storage.sessions[key]||{},{attempts:state.attempts,solved:state.solved,failed:state.failed,hintsRevealed:state.hintsRevealed},extra);if(!extra?.pips)storage.sessions[key].pips=getPipStates();saveStorage(storage);}
 function recordResult(won,guessNum){const s=storage.stats;s.played++;if(won){s.wins++;s.streak++;if(s.streak>s.bestStreak)s.bestStreak=s.streak;s.dist[guessNum]=(s.dist[guessNum]||0)+1;}else{s.streak=0;s.dist.miss=(s.dist.miss||0)+1;}saveStorage(storage);}
-function renderStats(){const s=storage.stats;document.getElementById('stat-played').textContent=s.played;document.getElementById('stat-wins').textContent=s.wins;document.getElementById('stat-streak').textContent=s.streak;document.getElementById('stat-pct').textContent=s.played?Math.round(s.wins/s.played*100)+'%':'0%';const max=Math.max(1,s.dist[1]||0,s.dist[2]||0,s.dist[3]||0,s.dist[4]||0,s.dist[5]||0,s.dist[6]||0,s.dist.miss||0);['1','2','3','4','5','6','miss'].forEach(k=>{const v=s.dist[k]||0;const bar=document.getElementById('dist-'+k);const num=document.getElementById('dist-'+k+'-n');if(bar)bar.style.width=(v/max*100)+'%';if(num)num.textContent=v;});}
+function renderStats(){const s=storage.stats;document.getElementById('stat-played').textContent=s.played;document.getElementById('stat-wins').textContent=s.wins;document.getElementById('stat-streak').textContent=s.streak;document.getElementById('stat-pct').textContent=s.played?Math.round(s.wins/s.played*100)+'%':'0%';const max=Math.max(1,s.dist[1]||0,s.dist[2]||0,s.dist[3]||0,s.dist.miss||0);['1','2','3','miss'].forEach(k=>{const v=s.dist[k]||0;const bar=document.getElementById('dist-'+k);const num=document.getElementById('dist-'+k+'-n');if(bar)bar.style.width=(v/max*100)+'%';if(num)num.textContent=v;});}
 function renderArchive(){const grid=document.getElementById('archive-grid');grid.innerHTML='';const maxIdx=Math.min(Math.max(0,getDayNum()),PUZZLES.length-1);PUZZLES.forEach((puz,idx)=>{if(idx>maxIdx)return;const card=document.createElement('div');card.className='archive-card';const sess=storage.sessions['p'+idx];const status=sess?.solved?'✓':sess?.failed?'✗':'';card.innerHTML='<div><div class="archive-card-player">'+(status?status+' ':'')+puz.manager+'</div><div class="archive-card-sub">'+puz.nationality+'</div></div><div class="archive-card-arrow">›</div>';card.addEventListener('click',()=>{loadPuzzle(idx);setView('game');});grid.appendChild(card);});}
 function showShareOptions(text){if(navigator.share&&/Mobi|Android/i.test(navigator.userAgent)){navigator.share({text}).catch(()=>copyToClipboard(text));return;}copyToClipboard(text);const waUrl='https://wa.me/?text='+encodeURIComponent(text);const existing=document.querySelector('.toast');if(existing)existing.remove();const t=document.createElement('div');t.className='toast';t.style.cssText='display:flex;align-items:center;gap:.75rem;';t.innerHTML='<span>Copied!</span><a href="'+waUrl+'" target="_blank" style="color:#25D366;font-weight:600;text-decoration:none;font-size:13px;">WhatsApp ↗</a>';document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 function shareResult(){const icons=getPipStates().filter(p=>p!==null).map(p=>p==='correct'?'🟩':'🟥').join('');const solved=state.solved;const line1='🧥 Missing Gaffer #'+puzzle.id;const line2=solved?icons+'  Solved in '+(state.attempts)+'!':icons+'  Not today!';const line3='missingfootball.com/missing-gaffer';const text=line1+'\n'+line2+'\n'+line3;showShareOptions(text);}
