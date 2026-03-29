@@ -115,7 +115,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
       <input type="text" id="guess-input" placeholder="Type the missing club…" autocomplete="off" autocorrect="off" spellcheck="false"/>
       <button class="guess-btn" onclick="submitGuess()">Guess</button>
     </div>
-    <div class="hint-reveal" id="hint-reveal"></div>
+    <div class="hint-reveal" id="hint-reveal" style="display:none"></div>
     <div class="result-banner" id="result-banner"></div>
   </div>
   <div class="post-game-btns" id="post-game-btns" style="display:none">
@@ -221,7 +221,7 @@ function loadPuzzle(idx){
   document.getElementById('puzzle-title').textContent=puzzle.manager;
   document.getElementById('puzzle-sub').textContent=puzzle.nationality+' · Guess the missing club';
   renderTimeline(puzzle,false);resetPips();
-  document.getElementById('result-banner').innerHTML='';document.getElementById('hint-reveal').innerHTML='';
+  document.getElementById('result-banner').innerHTML='';const _hr=document.getElementById('hint-reveal');_hr.innerHTML='';_hr.style.display='none';
   document.getElementById('post-game-btns').style.display='none';document.getElementById('guess-section').style.display='block';document.getElementById('guess-input').value='';
   const saved=storage.sessions['p'+idx];
   if(saved){
@@ -252,8 +252,8 @@ function renderTimeline(puz,reveal){
 function renderHints(){
   const puz=PUZZLES[state.puzzleIndex];
   const el=document.getElementById('hint-reveal');if(!el)return;
-  if(state.hintsRevealed>0){el.innerHTML='<div class="hint-line">💡 <strong>Clue:</strong> '+puz.hints[0]+'</div>';}
-  else{el.innerHTML='';}
+  if(state.hintsRevealed>0){el.innerHTML='<div class="hint-line">💡 <strong>Clue:</strong> '+puz.hints[0]+'</div>';el.style.display='block';}
+  else{el.innerHTML='';el.style.display='none';}
 }
 function submitGuess(){
   if(state.solved||state.failed)return;
