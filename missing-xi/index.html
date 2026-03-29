@@ -686,13 +686,20 @@ function loadPuzzle(idx,teamKey){
   document.getElementById('tab-b').classList.toggle('active',teamKey==='b');
 
   if(saved){
+    document.getElementById('result-banner').innerHTML='';
     state.attempts=saved.attempts; state.solved=saved.solved; state.failed=saved.failed;
     state.hintUsed=saved.hintUsed||false;
     const hintBtn=document.getElementById('hint-btn');
     if(state.hintUsed){if(hintBtn){hintBtn.classList.add('used');hintBtn.disabled=true;}if(saved.hintText)document.getElementById('hint-reveal').innerHTML=saved.hintText;}
     else if(state.attempts>=2&&!state.solved&&!state.failed){if(hintBtn)hintBtn.disabled=false;}
+    resetPips();
     (saved.pips||[]).forEach((pip,i)=>{const el=document.getElementById(`pip-${i}`);if(el&&pip)el.classList.add(pip);});
-    if(state.solved||state.failed) showEndState(state.solved,team);
+    if(state.solved||state.failed){
+      showEndState(state.solved,team);
+    } else {
+      document.getElementById('guess-input-row').style.display='flex';
+      document.getElementById('post-game-btns').style.display='none';
+    }
   } else {
     resetPips();
     document.getElementById('result-banner').innerHTML='';
