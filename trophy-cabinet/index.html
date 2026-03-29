@@ -1033,7 +1033,7 @@ function renderTrophies() {
     const row = document.createElement('div');
     row.className = 'trophy-row';
     const countDisplay = typeof t.count === 'number' ? '×' + t.count : t.count;
-    row.innerHTML = '<div class="trophy-icon">' + t.icon + '</div><div class="trophy-info"><div class="trophy-name">' + t.name + '</div><div class="trophy-detail">' + t.detail + '</div></div><div class="trophy-count">' + countDisplay + '</div>';
+    row.innerHTML = '<div class="trophy-icon">' + t.icon + '</div><div class="trophy-info"><div class="trophy-name">' + t.name + '</div></div><div class="trophy-count">' + countDisplay + '</div>';
     grid.appendChild(row);
   });
 }
@@ -1261,7 +1261,7 @@ function loadArchivePuzzle(index) {
     const row = document.createElement('div');
     row.className = 'trophy-row';
     const countDisplay = typeof t.count === 'number' ? '×' + t.count : t.count;
-    row.innerHTML = '<div class="trophy-icon">' + t.icon + '</div><div class="trophy-info"><div class="trophy-name">' + t.name + '</div><div class="trophy-detail">' + t.detail + '</div></div><div class="trophy-count">' + countDisplay + '</div>';
+    row.innerHTML = '<div class="trophy-icon">' + t.icon + '</div><div class="trophy-info"><div class="trophy-name">' + t.name + '</div></div><div class="trophy-count">' + countDisplay + '</div>';
     grid.appendChild(row);
   });
   setView('game');
