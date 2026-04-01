@@ -621,7 +621,7 @@ const PUZZLES = [
 // ═══════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════
-function getDayNum(){return Math.floor((new Date()-new Date('2026-04-01'))/86400000);}
+function getDayNum(){return Math.floor((new Date()-new Date('2026-02-01'))/86400000);}
 function getDailyPuzzleIndex(){
   const d=getDayNum();
   return d<0?0:d%PUZZLES.length;
