@@ -221,7 +221,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
       <input type="text" id="guess-input" placeholder="Type the missing player's name…" autocomplete="off" autocorrect="off" spellcheck="false"/>
       <button class="guess-btn" onclick="submitGuess()">Guess</button>
     </div>
-    <div class="hint-reveal" id="hint-reveal"></div>
+    <div class="hint-reveal" id="hint-reveal" style="display:none"></div>
   </div>
   <div class="post-game-btns" id="post-game-btns" style="display:none">
     <button class="share-btn" onclick="shareResult()">Share Result</button>
@@ -702,7 +702,7 @@ function loadPuzzle(idx,teamKey){
   document.querySelector('.guess-btn').disabled=false;
   resetHintButton();
 
-  if(saved){
+  if(saved&&(saved.dayNum===undefined||saved.dayNum===getDayNum())){
     state.attempts=saved.attempts||0; state.solved=saved.solved||false; state.failed=saved.failed||false;
     state.hintUsed=saved.hintUsed||false;
     if(isMulti){
@@ -715,7 +715,7 @@ function loadPuzzle(idx,teamKey){
     } else {
       (saved.pips||[]).forEach((pip,i)=>{const el=document.getElementById(`pip-${i}`);if(el&&pip)el.classList.add(pip);});
     }
-    if(state.hintUsed&&saved.hintText){document.getElementById('hint-reveal').innerHTML=saved.hintText;}
+    if(state.hintUsed&&saved.hintText){const hr=document.getElementById('hint-reveal');hr.innerHTML=saved.hintText;hr.style.display='block';}
     if(state.solved||state.failed||state.gameOver) showEndState(isMulti?state.foundCount===5:state.solved,team);
   }
   renderPitch(idx,teamKey);
@@ -737,6 +737,7 @@ function renderPitch(idx,teamKey){
     const isMissing=missingSet.has(i);
     const isFound=isMissing&&foundSet.has(i);
     const dot=document.createElement('div');
+    dot.id='pdot-'+i;
     dot.style.left=(100-p.pos[0])+'%';
     dot.style.top=p.pos[1]+'%';
     const shirt=document.createElement('div');
@@ -810,7 +811,7 @@ function submitGuess(){
   } else {
     pip.classList.add('wrong');
     state.attempts++;
-    if(state.attempts>=2&&!state.hintUsed){state.hintUsed=true;const hintHtml='\uD83D\uDCA1 '+team.hint;if(team.hint)document.getElementById('hint-reveal').innerHTML=hintHtml;}
+    if(state.attempts>=2&&!state.hintUsed&&team.hint){state.hintUsed=true;const hintHtml='\uD83D\uDCA1 '+team.hint;const hr=document.getElementById('hint-reveal');hr.innerHTML=hintHtml;hr.style.display='block';}
     if(state.attempts>=state.maxAttempts){
       state.failed=true;
       recordResult(false,0);
@@ -847,7 +848,8 @@ function submitGuessMulti(team){
       state.gameOver=true; state.solved=true;
       recordResult(true,state.wrongCount+1);
       showEndState(true,team);
-      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,gameOver:true,solved:true,failed:false});
+      const fp=state.foundIndices.map(idx=>({name:PUZZLES[state.puzzleIndex].teamA.players[idx].name,index:idx}));
+      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,gameOver:true,solved:true,failed:false,won:true,foundPlayers:fp,dayNum:getDayNum()});
     } else {
       showBanner(`\u2713 ${matched.name} — ${5-state.foundCount} to go`,'success');
       saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount});
@@ -857,13 +859,15 @@ function submitGuessMulti(team){
     const pip=document.getElementById(`pip-${state.wrongCount-1}`);
     if(pip)pip.classList.add('wrong');
     renderLives(state.wrongCount);
-    if(state.wrongCount>=1&&!state.hintUsed){state.hintUsed=true;const hintHtml='\uD83D\uDCA1 '+team.hint;document.getElementById('hint-reveal').innerHTML=hintHtml;saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,hintUsed:true,hintText:hintHtml});}
+    if(state.wrongCount===2&&!state.hintUsed){state.hintUsed=true;const hintHtml='\uD83D\uDCA1 '+team.hint;const hr=document.getElementById('hint-reveal');hr.innerHTML=hintHtml;hr.style.display='block';}
     if(state.wrongCount>=3){
       state.gameOver=true; state.failed=true;
       recordResult(false,0);
       showEndState(false,team);
       renderPitch(state.puzzleIndex,state.teamKey);
-      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,gameOver:true,solved:false,failed:true,hintUsed:state.hintUsed,hintText:document.getElementById('hint-reveal').innerHTML});
+      revealLostPlayers(team);
+      const fp=state.foundIndices.map(idx=>({name:PUZZLES[state.puzzleIndex].teamA.players[idx].name,index:idx}));
+      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,gameOver:true,solved:false,failed:true,won:false,hintUsed:state.hintUsed,hintText:document.getElementById('hint-reveal').innerHTML,foundPlayers:fp,dayNum:getDayNum()});
     } else {
       const left=3-state.wrongCount;
       showBanner(`Not quite — ${left} ${left===1?'life':'lives'} left`,'try-again');
@@ -897,7 +901,20 @@ function revealHint(){
   document.getElementById('hint-reveal').innerHTML=hintHtml;
   saveSession({hintUsed:true,hintText:hintHtml});
 }
-function resetHintButton(){document.getElementById('hint-reveal').innerHTML='';}
+function resetHintButton(){const hr=document.getElementById('hint-reveal');hr.innerHTML='';hr.style.display='none';}
+function revealLostPlayers(team){
+  state.remainingAnswers.forEach(ans=>{
+    const dot=document.getElementById('pdot-'+ans.playerIndex);
+    if(!dot)return;
+    const player=team.players[ans.playerIndex];
+    if(!player)return;
+    dot.className='player-dot wrong';
+    const shirt=dot.querySelector('.shirt');
+    if(shirt){shirt.style.background='var(--red)';shirt.style.color='#fff';shirt.textContent='\u2717';}
+    const pname=dot.querySelector('.pname');
+    if(pname)pname.textContent=player.name;
+  });
+}
 
 // ═══════════════════════════════════════════════════
 // END STATE
@@ -914,6 +931,10 @@ function showEndState(won,team){
   document.getElementById('guess-input-row').style.display='none';
   document.getElementById('post-game-btns').style.display='flex';
   document.getElementById('other-team-btn').style.display=state.teamKey==='a'?'block':'none';
+  const inp=document.getElementById('guess-input');
+  const btn=document.querySelector('.guess-btn');
+  if(inp)inp.disabled=true;
+  if(btn)btn.disabled=true;
 }
 function showBanner(html,type){
   document.getElementById('result-banner').innerHTML=`<div class="result-msg ${type}">${html}</div>`;
