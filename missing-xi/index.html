@@ -713,8 +713,9 @@ function renderPitch(idx,teamKey){
   const team=(teamKey==='a'?PUZZLES[idx].teamA:PUZZLES[idx].teamB);
   const layer=document.getElementById('players-layer');
   layer.innerHTML='';
+  const missingSet=new Set(team.missingIndices||[team.missingIndex]);
   team.players.forEach((p,i)=>{
-    const isMissing=(i===team.missingIndex);
+    const isMissing=missingSet.has(i);
     const isCorrect=isMissing&&state.solved;
     const isWrong=isMissing&&state.failed;
     const dot=document.createElement('div');
@@ -735,7 +736,7 @@ function renderPitch(idx,teamKey){
     const name=document.createElement('div');
     name.className='pname';
     if(isMissing&&!state.solved&&!state.failed) name.textContent=p.role||'?';
-    else if(isMissing) name.textContent=team.answer;
+    else if(isMissing) name.textContent=(i===team.missingIndex?team.answer:p.name);
     else name.textContent=p.name;
     dot.appendChild(shirt);
     dot.appendChild(name);
