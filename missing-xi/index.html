@@ -98,6 +98,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 .post-game-btns{display:flex;gap:8px;margin-top:.9rem}
 .share-btn{flex:1;padding:12px;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--text-primary)}
 .share-btn:hover{border-color:var(--white)}
+@keyframes ng-fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ng-pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,197,24,.4)}50%{box-shadow:0 0 0 8px rgba(245,197,24,0)}}
+.next-game-btn{width:100%;padding:11px;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;background:var(--accent);border:1px solid var(--accent);color:#000;animation:ng-fadein .4s ease,ng-pulse 2s ease-in-out .4s infinite}
+.next-game-btn:hover{background:#f7d04a;animation:none}
 
 /* ARCHIVE */
 .archive-header{margin-bottom:1.25rem}
@@ -214,6 +218,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
   </div>
   <div class="post-game-btns" id="post-game-btns" style="display:none">
     <button class="share-btn" onclick="shareResult()">Share Result</button>
+  </div>
+  <div id="next-game-row" style="display:none;margin-top:8px">
+    <button class="next-game-btn" onclick="window.location='/missing-club/'">▶ Play Missing Club</button>
   </div>
 </main>
 
@@ -672,6 +679,7 @@ function loadPuzzle(idx){
   document.getElementById('hint-reveal').innerHTML='';
   document.getElementById('guess-input-row').style.display='flex';
   document.getElementById('post-game-btns').style.display='none';
+  document.getElementById('next-game-row').style.display='none';
   const inp=document.getElementById('guess-input');
   inp.value=''; inp.disabled=false;
   document.querySelector('.guess-btn').disabled=false;
@@ -834,6 +842,7 @@ function showEndState(won){
   const btn=document.querySelector('.guess-btn');
   if(inp)inp.disabled=true;
   if(btn)btn.disabled=true;
+  setTimeout(()=>{document.getElementById('next-game-row').style.display='block';},2500);
 }
 function showBanner(html,type){
   document.getElementById('result-banner').innerHTML=`<div class="result-msg ${type}">${html}</div>`;
