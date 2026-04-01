@@ -221,9 +221,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
       <input type="text" id="guess-input" placeholder="Type the missing player's name…" autocomplete="off" autocorrect="off" spellcheck="false"/>
       <button class="guess-btn" onclick="submitGuess()">Guess</button>
     </div>
-    <div class="hint-row">
-      <button class="hint-btn" id="hint-btn" onclick="revealHint()" disabled>💡 Hint</button>
-    </div>
     <div class="hint-reveal" id="hint-reveal"></div>
   </div>
   <div class="post-game-btns" id="post-game-btns" style="display:none">
@@ -718,10 +715,7 @@ function loadPuzzle(idx,teamKey){
     } else {
       (saved.pips||[]).forEach((pip,i)=>{const el=document.getElementById(`pip-${i}`);if(el&&pip)el.classList.add(pip);});
     }
-    const hintBtn=document.getElementById('hint-btn');
-    const unlockHint=isMulti?(state.wrongCount>=1):(state.attempts>=2);
-    if(state.hintUsed){if(hintBtn){hintBtn.classList.add('used');hintBtn.disabled=true;}if(saved.hintText)document.getElementById('hint-reveal').innerHTML=saved.hintText;}
-    else if(unlockHint&&!state.solved&&!state.failed&&!state.gameOver){if(hintBtn)hintBtn.disabled=false;}
+    if(state.hintUsed&&saved.hintText){document.getElementById('hint-reveal').innerHTML=saved.hintText;}
     if(state.solved||state.failed||state.gameOver) showEndState(isMulti?state.foundCount===5:state.solved,team);
   }
   renderPitch(idx,teamKey);
@@ -816,7 +810,7 @@ function submitGuess(){
   } else {
     pip.classList.add('wrong');
     state.attempts++;
-    if(state.attempts>=2&&!state.hintUsed){const hintBtn=document.getElementById('hint-btn');if(hintBtn)hintBtn.disabled=false;}
+    if(state.attempts>=2&&!state.hintUsed){state.hintUsed=true;const hintHtml='\uD83D\uDCA1 '+team.hint;if(team.hint)document.getElementById('hint-reveal').innerHTML=hintHtml;}
     if(state.attempts>=state.maxAttempts){
       state.failed=true;
       recordResult(false,0);
@@ -863,17 +857,17 @@ function submitGuessMulti(team){
     const pip=document.getElementById(`pip-${state.wrongCount-1}`);
     if(pip)pip.classList.add('wrong');
     renderLives(state.wrongCount);
-    if(state.wrongCount>=1&&!state.hintUsed){const hintBtn=document.getElementById('hint-btn');if(hintBtn)hintBtn.disabled=false;}
+    if(state.wrongCount>=1&&!state.hintUsed){state.hintUsed=true;const hintHtml='\uD83D\uDCA1 '+team.hint;document.getElementById('hint-reveal').innerHTML=hintHtml;saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,hintUsed:true,hintText:hintHtml});}
     if(state.wrongCount>=3){
       state.gameOver=true; state.failed=true;
       recordResult(false,0);
       showEndState(false,team);
       renderPitch(state.puzzleIndex,state.teamKey);
-      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,gameOver:true,solved:false,failed:true});
+      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,gameOver:true,solved:false,failed:true,hintUsed:state.hintUsed,hintText:document.getElementById('hint-reveal').innerHTML});
     } else {
       const left=3-state.wrongCount;
       showBanner(`Not quite — ${left} ${left===1?'life':'lives'} left`,'try-again');
-      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,attempts:state.wrongCount});
+      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,attempts:state.wrongCount,hintUsed:state.hintUsed,hintText:document.getElementById('hint-reveal').innerHTML});
     }
   }
   input.value='';
@@ -903,7 +897,7 @@ function revealHint(){
   document.getElementById('hint-reveal').innerHTML=hintHtml;
   saveSession({hintUsed:true,hintText:hintHtml});
 }
-function resetHintButton(){const b=document.getElementById('hint-btn');if(b){b.classList.remove('used');b.disabled=true;}document.getElementById('hint-reveal').innerHTML='';}
+function resetHintButton(){document.getElementById('hint-reveal').innerHTML='';}
 
 // ═══════════════════════════════════════════════════
 // END STATE
