@@ -77,6 +77,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 .attempt-pip.correct{background:var(--green-result);border-color:var(--green-result)}
 .attempt-pip.wrong{background:var(--red);border-color:var(--red)}
 .lives-display{text-align:center;font-size:20px;letter-spacing:4px;margin-bottom:.5rem;min-height:28px;}
+.found-display{text-align:center;font-size:13px;font-weight:600;color:var(--text-muted);letter-spacing:.05em;margin-bottom:.4rem;min-height:18px;}
 #result-banner{margin-bottom:.75rem;min-height:0}
 .result-msg{text-align:center;font-size:14px;font-weight:500;padding:10px 14px;border-radius:var(--radius-sm);line-height:1.4}
 .result-msg.success{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);color:#2ecc71}
@@ -214,6 +215,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
       <div class="attempt-pip" id="pip-2"></div>
     </div>
     <div class="lives-display" id="lives-display"></div>
+    <div class="found-display" id="found-display"></div>
     <div id="result-banner"></div>
     <div class="guess-input-row" id="guess-input-row">
       <input type="text" id="guess-input" placeholder="Type the missing player's name…" autocomplete="off" autocorrect="off" spellcheck="false"/>
@@ -693,6 +695,7 @@ function loadPuzzle(idx,teamKey){
   // Reset all UI state to a clean baseline before restoring
   resetPips();
   document.getElementById('lives-display').textContent=isMulti?'\u2764\uFE0F\u2764\uFE0F\u2764\uFE0F':'';
+  document.getElementById('found-display').textContent=isMulti?'Found: 0/5':'';
   document.getElementById('result-banner').innerHTML='';
   document.getElementById('hint-reveal').innerHTML='';
   document.getElementById('guess-input-row').style.display='flex';
@@ -710,6 +713,7 @@ function loadPuzzle(idx,teamKey){
       state.wrongCount=saved.wrongCount||0; state.gameOver=saved.gameOver||false;
       state.remainingAnswers=team.answers.map((a,i)=>({name:a.name,acceptedAnswers:a.acceptedAnswers.slice(),playerIndex:team.missingIndices[i]})).filter(a=>!state.foundIndices.includes(a.playerIndex));
       renderLives(state.wrongCount);
+      document.getElementById('found-display').textContent='Found: '+state.foundCount+'/5';
       for(let wi=0;wi<state.wrongCount;wi++){const pip=document.getElementById(`pip-${wi}`);if(pip)pip.classList.add('wrong');}
     } else {
       (saved.pips||[]).forEach((pip,i)=>{const el=document.getElementById(`pip-${i}`);if(el&&pip)el.classList.add(pip);});
@@ -843,6 +847,7 @@ function submitGuessMulti(team){
     const matched=state.remainingAnswers.splice(matchIdx,1)[0];
     state.foundIndices=[...state.foundIndices,matched.playerIndex];
     state.foundCount++;
+    document.getElementById('found-display').textContent='Found: '+state.foundCount+'/5';
     renderPitch(state.puzzleIndex,state.teamKey);
     if(state.foundCount===5){
       state.gameOver=true; state.solved=true;
@@ -867,7 +872,7 @@ function submitGuessMulti(team){
       saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,gameOver:true,solved:false,failed:true});
     } else {
       const left=3-state.wrongCount;
-      showBanner(`Not quite — ${left} life${left===1?'':'s'} left`,'try-again');
+      showBanner(`Not quite — ${left} ${left===1?'life':'lives'} left`,'try-again');
       saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,attempts:state.wrongCount});
     }
   }
@@ -894,8 +899,9 @@ function revealHint(){
   state.hintUsed=true;
   const btn=document.getElementById('hint-btn');
   if(btn){btn.disabled=true;btn.classList.add('used');}
-  document.getElementById('hint-reveal').innerHTML=team.hint;
-  saveSession({hintUsed:true,hintText:team.hint});
+  const hintHtml='💡 '+team.hint;
+  document.getElementById('hint-reveal').innerHTML=hintHtml;
+  saveSession({hintUsed:true,hintText:hintHtml});
 }
 function resetHintButton(){const b=document.getElementById('hint-btn');if(b){b.classList.remove('used');b.disabled=true;}document.getElementById('hint-reveal').innerHTML='';}
 
@@ -905,8 +911,8 @@ function resetHintButton(){const b=document.getElementById('hint-btn');if(b){b.c
 function showEndState(won,team){
   const isMulti=state.teamKey==='a'&&team&&!!(team.answers&&team.missingIndices);
   if(isMulti){
-    if(won) showBanner('⚽ Brilliant! You found all 5 players!','success');
-    else showBanner(`You found ${state.foundCount}/5 — better luck tomorrow!`,'fail');
+    if(won) showBanner('⚽ Brilliant! You found all 5!','success');
+    else showBanner('Unlucky! Come back tomorrow.','fail');
   } else {
     if(won) showBanner(`Correct! The missing player was <strong>${team.answer}</strong>`,'success');
     else showBanner(`The answer was <strong>${team.answer}</strong>`,'fail');
@@ -1005,7 +1011,7 @@ function shareResult(){
   if(isMulti){
     const day=Math.max(1,getDayNum()+1);
     const hearts=['\u2764\uFE0F','\u2764\uFE0F','\u2764\uFE0F'].map((_,i)=>i<state.wrongCount?'\uD83D\uDDA4':'\u2764\uFE0F').join('');
-    text=[`⚽ Missing XI #${day}`,`Found ${state.foundCount}/5 — ${state.wrongCount} wrong`,hearts,'missingfootball.com'].join('\n');
+    text=[`⚽ Missing XI #${day}`,`Found ${state.foundCount}/5 ${hearts}`,'missingfootball.com'].join('\n');
   } else {
     const squares=getPipStates().map(p=>p==='correct'?'\uD83D\uDFE2':p==='wrong'?'\uD83D\uDD34':'\u2B1C').join('');
     const outcome=state.solved?`Got it in ${state.attempts+1}!`:`Missed it — it was ${team.answer}`;
