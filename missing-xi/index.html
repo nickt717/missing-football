@@ -733,6 +733,8 @@ function renderPitch(idx,teamKey){
   const isMulti=!!(team.missingIndices&&team.answers);
   const gameWon=isMulti&&state.gameOver&&state.foundCount===5;
   const gameLost=isMulti&&state.gameOver&&state.foundCount<5;
+  const answerMap=new Map();
+  if(isMulti){team.answers.forEach((a,j)=>answerMap.set(team.missingIndices[j],a.name));}
   team.players.forEach((p,i)=>{
     const isMissing=missingSet.has(i);
     const isFound=isMissing&&foundSet.has(i);
@@ -752,11 +754,11 @@ function renderPitch(idx,teamKey){
       } else if(isFound||(gameWon&&isMissing)){
         dot.className='player-dot correct';
         shirt.style.background=team.color;shirt.style.color=team.secondaryColor||'#fff';shirt.textContent='\u2713';
-        name.textContent=p.name;
+        name.textContent=answerMap.get(i)||p.name;
       } else if(gameLost&&!isFound){
         dot.className='player-dot wrong';
         shirt.style.background='var(--red)';shirt.style.color='#fff';shirt.textContent='\u2717';
-        name.textContent=p.name;
+        name.textContent=answerMap.get(i)||p.name;
       } else {
         dot.className='player-dot missing';
         shirt.textContent='?';
@@ -906,13 +908,11 @@ function revealLostPlayers(team){
   state.remainingAnswers.forEach(ans=>{
     const dot=document.getElementById('pdot-'+ans.playerIndex);
     if(!dot)return;
-    const player=team.players[ans.playerIndex];
-    if(!player)return;
     dot.className='player-dot wrong';
     const shirt=dot.querySelector('.shirt');
     if(shirt){shirt.style.background='var(--red)';shirt.style.color='#fff';shirt.textContent='\u2717';}
     const pname=dot.querySelector('.pname');
-    if(pname)pname.textContent=player.name;
+    if(pname)pname.textContent=ans.name;
   });
 }
 
