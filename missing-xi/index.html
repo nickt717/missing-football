@@ -76,6 +76,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 .attempt-pip{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--text-dim);background:transparent;transition:all .2s}
 .attempt-pip.correct{background:var(--green-result);border-color:var(--green-result)}
 .attempt-pip.wrong{background:var(--red);border-color:var(--red)}
+.lives-display{text-align:center;font-size:20px;letter-spacing:4px;margin-bottom:.5rem;min-height:28px;}
 #result-banner{margin-bottom:.75rem;min-height:0}
 .result-msg{text-align:center;font-size:14px;font-weight:500;padding:10px 14px;border-radius:var(--radius-sm);line-height:1.4}
 .result-msg.success{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);color:#2ecc71}
@@ -212,6 +213,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
       <div class="attempt-pip" id="pip-1"></div>
       <div class="attempt-pip" id="pip-2"></div>
     </div>
+    <div class="lives-display" id="lives-display"></div>
     <div id="result-banner"></div>
     <div class="guess-input-row" id="guess-input-row">
       <input type="text" id="guess-input" placeholder="Type the missing player's name…" autocomplete="off" autocorrect="off" spellcheck="false"/>
@@ -636,7 +638,7 @@ function checkGuess(guess,team){
 // ═══════════════════════════════════════════════════
 // STATE & STORAGE
 // ═══════════════════════════════════════════════════
-let state={puzzleIndex:0,teamKey:'a',attempts:0,maxAttempts:3,solved:false,failed:false,hintUsed:false};
+let state={puzzleIndex:0,teamKey:'a',attempts:0,maxAttempts:3,solved:false,failed:false,hintUsed:false,remainingAnswers:[],foundCount:0,foundIndices:[],wrongCount:0,gameOver:false};
 
 function loadStorage(){
   try{const r=localStorage.getItem('missingxi_v1');return r?JSON.parse(r):{stats:defaultStats(),sessions:{}};}
@@ -664,9 +666,12 @@ document.addEventListener('DOMContentLoaded',()=>{
 function loadPuzzle(idx,teamKey){
   state.puzzleIndex=idx; state.teamKey=teamKey;
   state.attempts=0; state.solved=false; state.failed=false; state.hintUsed=false;
+  state.remainingAnswers=[]; state.foundCount=0; state.foundIndices=[]; state.wrongCount=0; state.gameOver=false;
 
   const puzzle=PUZZLES[idx];
   const team=teamKey==='a'?puzzle.teamA:puzzle.teamB;
+  const isMulti=teamKey==='a'&&!!(team.answers&&team.missingIndices);
+  if(isMulti){state.remainingAnswers=team.answers.map((a,i)=>({name:a.name,acceptedAnswers:a.acceptedAnswers.slice(),playerIndex:team.missingIndices[i]}));}
   const sessionKey=`p${idx}_${teamKey}`;
   const saved=storage.sessions[sessionKey];
 
@@ -687,21 +692,33 @@ function loadPuzzle(idx,teamKey){
 
   // Reset all UI state to a clean baseline before restoring
   resetPips();
+  document.getElementById('lives-display').textContent=isMulti?'\u2764\uFE0F\u2764\uFE0F\u2764\uFE0F':'';
   document.getElementById('result-banner').innerHTML='';
   document.getElementById('hint-reveal').innerHTML='';
   document.getElementById('guess-input-row').style.display='flex';
   document.getElementById('post-game-btns').style.display='none';
-  document.getElementById('guess-input').value='';
+  const inp=document.getElementById('guess-input');
+  inp.value=''; inp.disabled=false;
+  document.querySelector('.guess-btn').disabled=false;
   resetHintButton();
 
   if(saved){
-    state.attempts=saved.attempts; state.solved=saved.solved; state.failed=saved.failed;
+    state.attempts=saved.attempts||0; state.solved=saved.solved||false; state.failed=saved.failed||false;
     state.hintUsed=saved.hintUsed||false;
+    if(isMulti){
+      state.foundCount=saved.foundCount||0; state.foundIndices=saved.foundIndices||[];
+      state.wrongCount=saved.wrongCount||0; state.gameOver=saved.gameOver||false;
+      state.remainingAnswers=team.answers.map((a,i)=>({name:a.name,acceptedAnswers:a.acceptedAnswers.slice(),playerIndex:team.missingIndices[i]})).filter(a=>!state.foundIndices.includes(a.playerIndex));
+      renderLives(state.wrongCount);
+      for(let wi=0;wi<state.wrongCount;wi++){const pip=document.getElementById(`pip-${wi}`);if(pip)pip.classList.add('wrong');}
+    } else {
+      (saved.pips||[]).forEach((pip,i)=>{const el=document.getElementById(`pip-${i}`);if(el&&pip)el.classList.add(pip);});
+    }
     const hintBtn=document.getElementById('hint-btn');
+    const unlockHint=isMulti?(state.wrongCount>=1):(state.attempts>=2);
     if(state.hintUsed){if(hintBtn){hintBtn.classList.add('used');hintBtn.disabled=true;}if(saved.hintText)document.getElementById('hint-reveal').innerHTML=saved.hintText;}
-    else if(state.attempts>=2&&!state.solved&&!state.failed){if(hintBtn)hintBtn.disabled=false;}
-    (saved.pips||[]).forEach((pip,i)=>{const el=document.getElementById(`pip-${i}`);if(el&&pip)el.classList.add(pip);});
-    if(state.solved||state.failed) showEndState(state.solved,team);
+    else if(unlockHint&&!state.solved&&!state.failed&&!state.gameOver){if(hintBtn)hintBtn.disabled=false;}
+    if(state.solved||state.failed||state.gameOver) showEndState(isMulti?state.foundCount===5:state.solved,team);
   }
   renderPitch(idx,teamKey);
 }
@@ -714,30 +731,57 @@ function renderPitch(idx,teamKey){
   const layer=document.getElementById('players-layer');
   layer.innerHTML='';
   const missingSet=new Set(team.missingIndices||[team.missingIndex]);
+  const foundSet=new Set(state.foundIndices||[]);
+  const isMulti=!!(team.missingIndices&&team.answers);
+  const gameWon=isMulti&&state.gameOver&&state.foundCount===5;
+  const gameLost=isMulti&&state.gameOver&&state.foundCount<5;
   team.players.forEach((p,i)=>{
     const isMissing=missingSet.has(i);
-    const isCorrect=isMissing&&state.solved;
-    const isWrong=isMissing&&state.failed;
+    const isFound=isMissing&&foundSet.has(i);
     const dot=document.createElement('div');
-    dot.className='player-dot'+(isMissing&&!state.solved&&!state.failed?' missing':'')+(isCorrect?' correct':'')+(isWrong?' wrong':'');
     dot.style.left=(100-p.pos[0])+'%';
     dot.style.top=p.pos[1]+'%';
     const shirt=document.createElement('div');
     shirt.className='shirt';
-    if(isMissing){
-      if(state.solved){shirt.style.background=team.color;shirt.style.color=team.secondaryColor;shirt.textContent='✓';}
-      else if(state.failed){shirt.style.background='var(--red)';shirt.style.color='#fff';shirt.textContent='✗';}
-      else{shirt.textContent='?';}
-    } else {
-      shirt.style.background=team.color;
-      shirt.style.color=team.secondaryColor||'#fff';
-      shirt.textContent=i+1;
-    }
     const name=document.createElement('div');
     name.className='pname';
-    if(isMissing&&!state.solved&&!state.failed) name.textContent=p.role||'?';
-    else if(isMissing) name.textContent=(i===team.missingIndex?team.answer:p.name);
-    else name.textContent=p.name;
+    if(isMulti){
+      if(!isMissing){
+        dot.className='player-dot';
+        shirt.style.background=team.color;shirt.style.color=team.secondaryColor||'#fff';shirt.textContent=i+1;
+        name.textContent=p.name;
+      } else if(isFound||(gameWon&&isMissing)){
+        dot.className='player-dot correct';
+        shirt.style.background=team.color;shirt.style.color=team.secondaryColor||'#fff';shirt.textContent='\u2713';
+        name.textContent=p.name;
+      } else if(gameLost&&!isFound){
+        dot.className='player-dot wrong';
+        shirt.style.background='var(--red)';shirt.style.color='#fff';shirt.textContent='\u2717';
+        name.textContent=p.name;
+      } else {
+        dot.className='player-dot missing';
+        shirt.textContent='?';
+        name.textContent=p.role||'?';
+      }
+    } else {
+      if(!isMissing){
+        dot.className='player-dot';
+        shirt.style.background=team.color;shirt.style.color=team.secondaryColor||'#fff';shirt.textContent=i+1;
+        name.textContent=p.name;
+      } else if(!state.solved&&!state.failed){
+        dot.className='player-dot missing';
+        shirt.textContent='?';
+        name.textContent=p.role||'?';
+      } else if(state.solved){
+        dot.className='player-dot correct';
+        shirt.style.background=team.color;shirt.style.color=team.secondaryColor||'#fff';shirt.textContent='\u2713';
+        name.textContent=(i===team.missingIndex?team.answer:p.name);
+      } else {
+        dot.className='player-dot wrong';
+        shirt.style.background='var(--red)';shirt.style.color='#fff';shirt.textContent='\u2717';
+        name.textContent=(i===team.missingIndex?team.answer:p.name);
+      }
+    }
     dot.appendChild(shirt);
     dot.appendChild(name);
     layer.appendChild(dot);
@@ -748,12 +792,14 @@ function renderPitch(idx,teamKey){
 // GUESSING
 // ═══════════════════════════════════════════════════
 function submitGuess(){
+  const puzzle=PUZZLES[state.puzzleIndex];
+  const team=state.teamKey==='a'?puzzle.teamA:puzzle.teamB;
+  if(state.teamKey==='a'&&team.answers&&team.missingIndices) return submitGuessMulti(team);
+  // ── single-mode (teamB) ──
   if(state.solved||state.failed) return;
   const input=document.getElementById('guess-input');
   const val=input.value.trim();
   if(!val){input.focus();return;}
-  const puzzle=PUZZLES[state.puzzleIndex];
-  const team=state.teamKey==='a'?puzzle.teamA:puzzle.teamB;
   const correct=checkGuess(val,team);
   const pip=document.getElementById(`pip-${state.attempts}`);
   if(correct){
@@ -777,6 +823,52 @@ function submitGuess(){
       const left=state.maxAttempts-state.attempts;
       showBanner(`Not quite — ${left} attempt${left===1?'':'s'} left`,'try-again');
       saveSession({pips:getPipStates()});
+    }
+  }
+  input.value='';
+  renderStats();
+}
+
+function submitGuessMulti(team){
+  if(state.gameOver) return;
+  const input=document.getElementById('guess-input');
+  const val=input.value.trim();
+  if(!val){input.focus();return;}
+  const g=normaliseAnswer(val);
+  let matchIdx=-1;
+  for(let i=0;i<state.remainingAnswers.length;i++){
+    if(state.remainingAnswers[i].acceptedAnswers.some(a=>normaliseAnswer(a)===g)){matchIdx=i;break;}
+  }
+  if(matchIdx>=0){
+    const matched=state.remainingAnswers.splice(matchIdx,1)[0];
+    state.foundIndices=[...state.foundIndices,matched.playerIndex];
+    state.foundCount++;
+    renderPitch(state.puzzleIndex,state.teamKey);
+    if(state.foundCount===5){
+      state.gameOver=true; state.solved=true;
+      recordResult(true,state.wrongCount+1);
+      showEndState(true,team);
+      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,gameOver:true,solved:true,failed:false});
+    } else {
+      showBanner(`\u2713 ${matched.name} — ${5-state.foundCount} to go`,'success');
+      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount});
+    }
+  } else {
+    state.wrongCount++;
+    const pip=document.getElementById(`pip-${state.wrongCount-1}`);
+    if(pip)pip.classList.add('wrong');
+    renderLives(state.wrongCount);
+    if(state.wrongCount>=1&&!state.hintUsed){const hintBtn=document.getElementById('hint-btn');if(hintBtn)hintBtn.disabled=false;}
+    if(state.wrongCount>=3){
+      state.gameOver=true; state.failed=true;
+      recordResult(false,0);
+      showEndState(false,team);
+      renderPitch(state.puzzleIndex,state.teamKey);
+      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,gameOver:true,solved:false,failed:true});
+    } else {
+      const left=3-state.wrongCount;
+      showBanner(`Not quite — ${left} life${left===1?'':'s'} left`,'try-again');
+      saveSession({foundCount:state.foundCount,foundIndices:state.foundIndices,wrongCount:state.wrongCount,attempts:state.wrongCount});
     }
   }
   input.value='';
@@ -811,8 +903,14 @@ function resetHintButton(){const b=document.getElementById('hint-btn');if(b){b.c
 // END STATE
 // ═══════════════════════════════════════════════════
 function showEndState(won,team){
-  if(won) showBanner(`Correct! The missing player was <strong>${team.answer}</strong>`,'success');
-  else showBanner(`The answer was <strong>${team.answer}</strong>`,'fail');
+  const isMulti=state.teamKey==='a'&&team&&!!(team.answers&&team.missingIndices);
+  if(isMulti){
+    if(won) showBanner('⚽ Brilliant! You found all 5 players!','success');
+    else showBanner(`You found ${state.foundCount}/5 — better luck tomorrow!`,'fail');
+  } else {
+    if(won) showBanner(`Correct! The missing player was <strong>${team.answer}</strong>`,'success');
+    else showBanner(`The answer was <strong>${team.answer}</strong>`,'fail');
+  }
   document.getElementById('guess-input-row').style.display='none';
   document.getElementById('post-game-btns').style.display='flex';
   document.getElementById('other-team-btn').style.display=state.teamKey==='a'?'block':'none';
@@ -894,6 +992,7 @@ function saveSession(extra){
   saveStorage(storage);
 }
 function resetPips(){[0,1,2].forEach(i=>{const p=document.getElementById(`pip-${i}`);if(p)p.classList.remove('correct','wrong');});}
+function renderLives(wrongCount){const el=document.getElementById('lives-display');if(!el)return;el.textContent=['\u2764\uFE0F','\u2764\uFE0F','\u2764\uFE0F'].map((_,i)=>i<wrongCount?'\uD83D\uDDA4':'\u2764\uFE0F').join('');}
 
 // ═══════════════════════════════════════════════════
 // SHARE
@@ -901,9 +1000,17 @@ function resetPips(){[0,1,2].forEach(i=>{const p=document.getElementById(`pip-${
 function shareResult(){
   const puzzle=PUZZLES[state.puzzleIndex];
   const team=state.teamKey==='a'?puzzle.teamA:puzzle.teamB;
-  const squares=getPipStates().map(p=>p==='correct'?'🟢':p==='wrong'?'🔴':'⬜').join('');
-  const outcome=state.solved?`Got it in ${state.attempts+1}!`:`Missed it — it was ${team.answer}`;
-  const text=[`⚽ Missing XI — Puzzle #${state.puzzleIndex+1}`,puzzle.match,`${team.name}: ${outcome}`,squares,'missingxi.com'].join('\n');
+  const isMulti=state.teamKey==='a'&&!!(team.answers&&team.missingIndices);
+  let text;
+  if(isMulti){
+    const day=Math.max(1,getDayNum()+1);
+    const hearts=['\u2764\uFE0F','\u2764\uFE0F','\u2764\uFE0F'].map((_,i)=>i<state.wrongCount?'\uD83D\uDDA4':'\u2764\uFE0F').join('');
+    text=[`⚽ Missing XI #${day}`,`Found ${state.foundCount}/5 — ${state.wrongCount} wrong`,hearts,'missingfootball.com'].join('\n');
+  } else {
+    const squares=getPipStates().map(p=>p==='correct'?'\uD83D\uDFE2':p==='wrong'?'\uD83D\uDD34':'\u2B1C').join('');
+    const outcome=state.solved?`Got it in ${state.attempts+1}!`:`Missed it — it was ${team.answer}`;
+    text=[`⚽ Missing XI — Puzzle #${state.puzzleIndex+1}`,puzzle.match,`${team.name}: ${outcome}`,squares,'missingxi.com'].join('\n');
+  }
   if(navigator.clipboard){navigator.clipboard.writeText(text).then(showToast).catch(()=>fallbackCopy(text));}
   else fallbackCopy(text);
 }
