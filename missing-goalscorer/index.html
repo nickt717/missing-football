@@ -138,6 +138,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
     <button class="pg-btn" onclick="setView('archive')">Archive</button>
   </div>
   <div class="countdown-row" id="countdown-row" style="display:none"></div>
+  <div id="completion-row" style="display:none;margin-top:10px;text-align:center;font-size:13px;color:var(--text-muted)"></div>
 </div>
 
 <div class="view" id="view-archive">
@@ -1131,6 +1132,7 @@ function loadPuzzle(idx){
   document.getElementById('hint-reveal').innerHTML='';
   document.getElementById('post-game-btns').style.display='none';
   document.getElementById('countdown-row').style.display='none';
+  document.getElementById('completion-row').style.display='none';
   document.getElementById('guess-input-row').style.display='flex';
   document.getElementById('guess-input').value='';
   document.getElementById('guess-input').disabled=false;
@@ -1209,6 +1211,26 @@ function showEndState(won,puz){
   document.getElementById('post-game-btns').style.display='flex';
   document.getElementById('countdown-row').style.display='block';
   startCountdown();
+  showCompletionMessage(won);
+}
+
+function showCompletionMessage(won){
+  const today=new Date().toISOString().slice(0,10);
+  const others=[
+    {lp:'xi_lastPlayed',lr:'xi_lastResult'},
+    {lp:'mc_lastPlayed',lr:'mc_lastResult'},
+    {lp:'tc_lastPlayed',lr:'tc_lastResult'},
+    {lp:'mf_lastPlayed',lr:'mf_lastResult'}
+  ];
+  let wins=won?1:0;
+  others.forEach(g=>{if(localStorage.getItem(g.lp)===today&&localStorage.getItem(g.lr)==='win')wins++;});
+  const dateStr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const row=document.getElementById('completion-row');
+  row.innerHTML='<div style="padding:10px 0;border-top:1px solid var(--border);margin-top:6px">'
+    +'<div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:4px">🎉 You\'ve played all 5 games today! Come back tomorrow for 5 new puzzles.</div>'
+    +'<div>'+dateStr+' &mdash; Daily score: <strong style="color:var(--accent)">'+wins+'/5</strong></div>'
+    +'</div>';
+  row.style.display='block';
 }
 
 function startCountdown(){
