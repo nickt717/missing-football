@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Missing Goalscorer — Daily Football Puzzle</title>
+<meta name="description" content="Daily football puzzle — guess the missing goalscorer from a famous match. New puzzle every day.">
+<meta property="og:title" content="Missing Goalscorer — Daily Football Puzzle">
+<meta property="og:description" content="Can you identify the missing goalscorer from a famous football match? A new puzzle every day.">
+<meta property="og:url" content="https://missingfootball.com/missing-goalscorer/">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f0f0f;--bg-card:#1a1a1a;--bg-elevated:#242424;--border:rgba(255,255,255,0.08);--border-strong:rgba(255,255,255,0.18);--text-primary:#f2f0eb;--text-muted:#888;--text-dim:#555;--accent:#e8a838;--accent-dim:rgba(232,168,56,0.15);--red:#e03c31;--green:#27ae60;--radius:10px;--radius-sm:6px;}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;padding-bottom:3rem}
+.site-header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-inner{max-width:560px;margin:0 auto;padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.logo{font-family:'Bebas Neue',sans-serif;letter-spacing:.04em;line-height:1;flex-shrink:0}
+.logo-main{font-size:19px;color:var(--text-primary)}
+.logo-sub{font-size:19px;color:var(--accent);margin-left:5px}
+.header-nav{display:flex;gap:4px;flex-shrink:0}
+.nav-btn{background:none;border:1px solid transparent;border-radius:var(--radius-sm);color:var(--text-muted);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:5px 12px;cursor:pointer;transition:all .15s}
+.nav-btn:hover{color:var(--text-primary);border-color:var(--border-strong)}
+.nav-btn.active{color:var(--accent);border-color:var(--accent);background:var(--accent-dim)}
+.home-link{color:var(--text-muted);font-size:12px;font-weight:500;text-decoration:none;letter-spacing:.02em;display:flex;align-items:center;gap:3px;transition:color .15s;white-space:nowrap;flex-shrink:0}
+.home-link:hover{color:var(--text-primary)}
+.view{display:none;max-width:560px;margin:0 auto;padding:1.5rem 1.25rem 0}
+.view.active{display:block}
+.puzzle-meta{text-align:center;margin-bottom:1.1rem}
+.puzzle-badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(232,168,56,.3);border-radius:20px;padding:3px 12px;margin-bottom:.6rem}
+.puzzle-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.03em;color:var(--text-primary);margin-bottom:.25rem}
+.puzzle-sub{font-size:12px;color:var(--text-muted)}
+.match-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.match-competition{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+.match-score{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.03em;color:var(--text-primary);margin-bottom:.2rem}
+.match-info{font-size:12px;color:var(--text-muted);margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.team-section{margin-bottom:.75rem}
+.team-section:last-child{margin-bottom:0}
+.team-header{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.35rem;padding-bottom:.3rem;border-bottom:1px solid var(--border)}
+.scorer-row{display:flex;align-items:center;gap:10px;padding:.45rem 0;border-bottom:1px solid var(--border)}
+.scorer-row:last-child{border-bottom:none}
+.scorer-minute{font-size:12px;color:var(--text-dim);width:36px;text-align:right;flex-shrink:0;font-weight:500}
+.scorer-name{font-size:15px;font-weight:500;color:var(--text-primary)}
+.missing-slot{display:inline-flex;align-items:center;background:var(--accent-dim);border:1px dashed rgba(232,168,56,.45);border-radius:var(--radius-sm);padding:2px 10px;color:var(--accent);font-size:14px;font-weight:600;letter-spacing:.04em}
+.guess-section{margin-top:1rem}
+.pips{display:flex;gap:6px;justify-content:center;margin-bottom:.85rem}
+.pip{width:10px;height:10px;border-radius:50%;background:var(--bg-elevated);border:1px solid var(--border-strong);transition:all .2s}
+.pip.correct{background:var(--green);border-color:var(--green)}
+.pip.wrong{background:var(--red);border-color:var(--red)}
+.guess-input-row{display:flex;gap:8px}
+#guess-input{flex:1;background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:15px;padding:10px 14px;outline:none;transition:border .15s}
+#guess-input:focus{border-color:var(--accent)}
+#guess-input::placeholder{color:var(--text-dim)}
+.guess-btn{background:var(--accent);border:none;border-radius:var(--radius-sm);color:#000;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;padding:10px 20px;cursor:pointer;transition:background .15s}
+.guess-btn:hover{background:#f0b840}
+.hint-reveal{margin-top:.6rem;font-size:13px;color:var(--text-muted);min-height:18px;line-height:1.5}
+.hint-reveal strong{color:var(--text-primary)}
+.result-banner{margin-top:.75rem;border-radius:var(--radius-sm);overflow:hidden}
+.result-msg{padding:.7rem 1rem;font-size:14px;font-weight:500;text-align:center}
+.result-msg.success{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);color:#4ecf82}
+.result-msg.fail{background:rgba(224,60,49,.1);border:1px solid rgba(224,60,49,.25);color:#f07068}
+.post-game-btns{display:flex;gap:8px;margin-top:.75rem;justify-content:center}
+.pg-btn{background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:8px 16px;cursor:pointer}
+.pg-btn:hover{border-color:var(--accent);color:var(--accent)}
+.pg-btn.share-btn{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.countdown-row{margin-top:10px;text-align:center;font-size:13px;color:var(--text-muted)}
+.countdown-row strong{color:var(--text-primary)}
+.archive-grid{display:flex;flex-direction:column;gap:8px}
+.archive-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem 1rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border .15s}
+.archive-card:hover{border-color:var(--border-strong)}
+.archive-card-title{font-size:15px;font-weight:500;color:var(--text-primary)}
+.archive-card-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.archive-card-arrow{color:var(--text-dim);font-size:14px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+.stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem .5rem;text-align:center}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text-primary);line-height:1}
+.stat-label{font-size:11px;color:var(--text-muted);margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+.dist-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.dist-label{font-size:12px;color:var(--text-muted);width:50px;text-align:right;flex-shrink:0}
+.dist-bar-wrap{flex:1;background:var(--bg-elevated);border-radius:3px;height:16px;overflow:hidden}
+.dist-bar{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
+.dist-n{font-size:12px;color:var(--text-muted);width:24px;text-align:right;flex-shrink:0}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-size:13px;padding:.6rem 1.1rem;z-index:999;pointer-events:none;white-space:nowrap}
+</style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5496535965795902" crossorigin="anonymous"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a href="https://missingfootball.com" class="home-link">← Home</a>
+    <div class="logo"><span class="logo-main">MISSING</span><span class="logo-sub">GOALSCORER</span></div>
+    <nav class="header-nav">
+      <button class="nav-btn active" data-view="game" onclick="setView('game')">Today</button>
+      <button class="nav-btn" data-view="archive" onclick="setView('archive')">Archive</button>
+      <button class="nav-btn" data-view="stats" onclick="setView('stats')">Stats</button>
+    </nav>
+  </div>
+</header>
+
+<div class="view active" id="view-game">
+  <div class="puzzle-meta">
+    <div class="puzzle-badge" id="puzzle-badge">PUZZLE #1</div>
+    <div class="puzzle-title" id="puzzle-title">Loading…</div>
+    <div class="puzzle-sub" id="puzzle-sub"></div>
+  </div>
+  <div class="match-card">
+    <div class="match-competition" id="match-competition"></div>
+    <div class="match-score" id="match-score"></div>
+    <div class="match-info" id="match-info"></div>
+    <div id="scorers-list"></div>
+  </div>
+  <div class="guess-section" id="guess-section">
+    <div class="pips" id="pips">
+      <div class="pip" id="pip-0"></div>
+      <div class="pip" id="pip-1"></div>
+      <div class="pip" id="pip-2"></div>
+    </div>
+    <div class="guess-input-row" id="guess-input-row">
+      <input type="text" id="guess-input" placeholder="Type the missing goalscorer's name…" autocomplete="off" autocorrect="off" spellcheck="false"/>
+      <button class="guess-btn" onclick="submitGuess()">Guess</button>
+    </div>
+    <div class="hint-reveal" id="hint-reveal"></div>
+    <div class="result-banner" id="result-banner"></div>
+  </div>
+  <div class="post-game-btns" id="post-game-btns" style="display:none">
+    <button class="pg-btn share-btn" onclick="shareResult()">Share 📋</button>
+    <button class="pg-btn" onclick="setView('archive')">Archive</button>
+  </div>
+  <div class="countdown-row" id="countdown-row" style="display:none"></div>
+</div>
+
+<div class="view" id="view-archive">
+  <div class="puzzle-badge" style="margin-bottom:1rem">All Puzzles</div>
+  <div class="archive-grid" id="archive-grid"></div>
+</div>
+
+<div class="view" id="view-stats">
+  <div class="puzzle-badge" style="margin-bottom:1rem">Your Stats</div>
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-num" id="stat-played">0</div><div class="stat-label">Played</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-wins">0</div><div class="stat-label">Won</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+    <div class="stat-box"><div class="stat-num" id="stat-pct">0%</div><div class="stat-label">Win %</div></div>
+  </div>
+  <div style="margin-bottom:.5rem;font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Guess Distribution</div>
+  <div class="dist-row"><div class="dist-label">1st</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-1" style="width:0%"></div></div><div class="dist-n" id="dist-1-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">2nd</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-2" style="width:0%"></div></div><div class="dist-n" id="dist-2-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">3rd</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-3" style="width:0%"></div></div><div class="dist-n" id="dist-3-n">0</div></div>
+  <div class="dist-row"><div class="dist-label">Miss</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-miss" style="width:0%"></div></div><div class="dist-n" id="dist-miss-n">0</div></div>
+</div>
+
+<script>
+const PUZZLES = [
+  {
+    id: 1,
+    competition: "UEFA Champions League Final",
+    team1: "Liverpool", team2: "AC Milan",
+    date: "25 May 2005", score: "3–3 (Liverpool win on pens)",
+    scorers: [
+      {name:"Maldini", minute:"1'", team:"AC Milan"},
+      {name:"Crespo", minute:"39'", team:"AC Milan"},
+      {name:"Crespo", minute:"44'", team:"AC Milan"},
+      {name:"Gerrard", minute:"54'", team:"Liverpool"},
+      {name:"Šmicer", minute:"56'", team:"Liverpool"},
+      {name:"Xabi Alonso", minute:"60'", team:"Liverpool"}
+    ],
+    hidden: "Šmicer",
+    hint: "Czech"
+  },
+  {
+    id: 2,
+    competition: "UEFA Euro 2008 Final",
+    team1: "Germany", team2: "Spain",
+    date: "29 June 2008", score: "0–1",
+    scorers: [
+      {name:"Fernando Torres", minute:"33'", team:"Spain"}
+    ],
+    hidden: "Fernando Torres",
+    hint: "Spanish"
+  }
+];
+
+let state={puzzleIndex:0,attempts:0,maxAttempts:3,solved:false,failed:false,hintShown:false};
+let puzzle;
+
+function loadStorage(){try{const r=localStorage.getItem('mg_v1');return r?JSON.parse(r):{stats:defaultStats(),sessions:{}};}catch{return{stats:defaultStats(),sessions:{}};}}
+function saveStorage(d){try{localStorage.setItem('mg_v1',JSON.stringify(d));}catch{}}
+function defaultStats(){return{played:0,wins:0,streak:0,bestStreak:0,dist:{1:0,2:0,3:0,miss:0}};}
+let storage=loadStorage();
+
+function getDayNum(){return Math.floor((Date.now()-new Date('2026-04-01T00:00:00Z').getTime())/86400000);}
+function getDailyPuzzleIndex(){const d=getDayNum();return d<0?0:d%PUZZLES.length;}
+function normalise(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s]/g,"").trim();}
+function checkGuess(guess,puz){
+  const g=normalise(guess);
+  const h=normalise(puz.hidden);
+  if(g===h)return true;
+  // accept surname-only for multi-word names
+  const parts=h.split(' ');
+  return parts.length>1&&parts[parts.length-1].length>2&&g===parts[parts.length-1];
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  state.puzzleIndex=getDailyPuzzleIndex();
+  loadPuzzle(state.puzzleIndex);
+  document.getElementById('puzzle-badge').textContent='PUZZLE #'+Math.max(1,getDayNum()+1);
+  renderArchive();renderStats();
+  document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitGuess();});
+});
+
+function loadPuzzle(idx){
+  puzzle=PUZZLES[idx];
+  state.puzzleIndex=idx;state.attempts=0;state.solved=false;state.failed=false;state.hintShown=false;
+  document.getElementById('puzzle-badge').textContent='PUZZLE #'+puzzle.id;
+  document.getElementById('puzzle-title').textContent=puzzle.team1+' vs '+puzzle.team2;
+  document.getElementById('puzzle-sub').textContent='Who is the missing goalscorer?';
+  document.getElementById('match-competition').textContent=puzzle.competition;
+  document.getElementById('match-score').textContent=puzzle.team1+' '+puzzle.score+' '+puzzle.team2;
+  document.getElementById('match-info').textContent=puzzle.date;
+  document.getElementById('result-banner').innerHTML='';
+  document.getElementById('hint-reveal').innerHTML='';
+  document.getElementById('post-game-btns').style.display='none';
+  document.getElementById('countdown-row').style.display='none';
+  document.getElementById('guess-input-row').style.display='flex';
+  document.getElementById('guess-input').value='';
+  document.getElementById('guess-input').disabled=false;
+  document.querySelector('.guess-btn').disabled=false;
+  resetPips();
+  renderScorers(false);
+
+  const saved=storage.sessions['p'+idx];
+  if(saved){
+    state.attempts=saved.attempts||0;state.solved=saved.solved||false;state.failed=saved.failed||false;state.hintShown=saved.hintShown||false;
+    [0,1,2].forEach(i=>{const el=document.getElementById('pip-'+i);if(el&&saved.pips&&saved.pips[i])el.classList.add(saved.pips[i]);});
+    if(state.hintShown)document.getElementById('hint-reveal').innerHTML='💡 Nationality: <strong>'+puzzle.hint+'</strong>';
+    if(state.solved||state.failed){renderScorers(true);showEndState(state.solved,puzzle);}
+  }
+}
+
+function renderScorers(reveal){
+  const container=document.getElementById('scorers-list');container.innerHTML='';
+  [puzzle.team1,puzzle.team2].forEach(team=>{
+    const teamScorers=puzzle.scorers.filter(s=>s.team===team);
+    if(!teamScorers.length)return;
+    const section=document.createElement('div');section.className='team-section';
+    const header=document.createElement('div');header.className='team-header';header.textContent=team;
+    section.appendChild(header);
+    teamScorers.forEach(scorer=>{
+      const isHidden=normalise(scorer.name)===normalise(puzzle.hidden);
+      const row=document.createElement('div');row.className='scorer-row';
+      const min=document.createElement('div');min.className='scorer-minute';min.textContent=scorer.minute;
+      const name=document.createElement('div');name.className='scorer-name';
+      if(isHidden&&!reveal){
+        const slot=document.createElement('span');slot.className='missing-slot';slot.textContent='???';
+        name.appendChild(slot);
+      } else if(isHidden&&reveal){
+        name.style.color=state.solved?'var(--green)':'var(--red)';
+        name.textContent=scorer.name;
+      } else {
+        name.textContent=scorer.name;
+      }
+      row.appendChild(min);row.appendChild(name);section.appendChild(row);
+    });
+    container.appendChild(section);
+  });
+}
+
+function submitGuess(){
+  if(state.solved||state.failed)return;
+  const input=document.getElementById('guess-input');const val=input.value.trim();if(!val){input.focus();return;}
+  const correct=checkGuess(val,puzzle);const pip=document.getElementById('pip-'+state.attempts);
+  if(correct){
+    pip.classList.add('correct');state.solved=true;
+    recordResult(true,state.attempts+1);
+    renderScorers(true);showEndState(true,puzzle);
+  } else {
+    pip.classList.add('wrong');state.attempts++;
+    if(state.attempts>=2&&!state.hintShown){
+      state.hintShown=true;
+      document.getElementById('hint-reveal').innerHTML='💡 Nationality: <strong>'+puzzle.hint+'</strong>';
+    }
+    if(state.attempts>=state.maxAttempts){
+      state.failed=true;recordResult(false,0);renderScorers(true);showEndState(false,puzzle);
+    } else {
+      const remaining=state.maxAttempts-state.attempts;
+      document.getElementById('result-banner').innerHTML='<div class="result-msg fail">✗ Not quite — '+remaining+' attempt'+(remaining===1?'':'s')+' left</div>';
+    }
+  }
+  input.value='';saveSession();
+}
+
+function showEndState(won,puz){
+  const banner=document.getElementById('result-banner');
+  if(won){banner.innerHTML='<div class="result-msg success">✓ Correct! The missing goalscorer was <strong>'+puz.hidden+'</strong></div>';}
+  else{banner.innerHTML='<div class="result-msg fail">The missing goalscorer was <strong>'+puz.hidden+'</strong></div>';}
+  document.getElementById('guess-input-row').style.display='none';
+  document.getElementById('post-game-btns').style.display='flex';
+  document.getElementById('countdown-row').style.display='block';
+  startCountdown();
+}
+
+function startCountdown(){
+  function update(){
+    const now=new Date();
+    const midnight=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+1));
+    const diff=midnight-now;
+    if(diff<=0){document.getElementById('countdown-row').textContent='New puzzle available!';return;}
+    const h=Math.floor(diff/3600000);const m=Math.floor((diff%3600000)/60000);const s=Math.floor((diff%60000)/1000);
+    document.getElementById('countdown-row').innerHTML='Next puzzle in <strong>'+h+'h '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s</strong>';
+  }
+  update();setInterval(update,1000);
+}
+
+function resetPips(){[0,1,2].forEach(i=>{const p=document.getElementById('pip-'+i);if(p)p.className='pip';});}
+function getPipStates(){return[0,1,2].map(i=>{const p=document.getElementById('pip-'+i);if(p){if(p.classList.contains('correct'))return'correct';if(p.classList.contains('wrong'))return'wrong';}return null;});}
+
+function saveSession(){
+  const key='p'+state.puzzleIndex;
+  storage.sessions[key]=Object.assign(storage.sessions[key]||{},{attempts:state.attempts,solved:state.solved,failed:state.failed,hintShown:state.hintShown,pips:getPipStates()});
+  saveStorage(storage);
+  if(state.solved||state.failed){
+    const todayUTC=new Date().toISOString().slice(0,10);
+    const lastPlayed=localStorage.getItem('mg_lastPlayed');
+    const yesterdayUTC=new Date(Date.now()-86400000).toISOString().slice(0,10);
+    const prevStreak=parseInt(localStorage.getItem('mg_streak')||'0',10);
+    if(state.solved){
+      const newStreak=(lastPlayed===yesterdayUTC||lastPlayed===todayUTC)?prevStreak+1:1;
+      localStorage.setItem('mg_streak',String(newStreak));
+      localStorage.setItem('mg_lastResult','win');
+    } else {
+      localStorage.setItem('mg_streak','0');
+      localStorage.setItem('mg_lastResult','loss');
+    }
+    localStorage.setItem('mg_lastPlayed',todayUTC);
+  }
+}
+
+function recordResult(won,guessNum){
+  const s=storage.stats;s.played++;
+  if(won){s.wins++;s.streak++;if(s.streak>s.bestStreak)s.bestStreak=s.streak;s.dist[guessNum]=(s.dist[guessNum]||0)+1;}
+  else{s.streak=0;s.dist.miss=(s.dist.miss||0)+1;}
+  saveStorage(storage);
+}
+
+function renderStats(){
+  const s=storage.stats;
+  document.getElementById('stat-played').textContent=s.played;
+  document.getElementById('stat-wins').textContent=s.wins;
+  document.getElementById('stat-streak').textContent=parseInt(localStorage.getItem('mg_streak')||'0',10);
+  document.getElementById('stat-pct').textContent=s.played?Math.round(s.wins/s.played*100)+'%':'0%';
+  const max=Math.max(1,s.dist[1]||0,s.dist[2]||0,s.dist[3]||0,s.dist.miss||0);
+  ['1','2','3','miss'].forEach(k=>{const v=s.dist[k]||0;const bar=document.getElementById('dist-'+k);const num=document.getElementById('dist-'+k+'-n');if(bar)bar.style.width=(v/max*100)+'%';if(num)num.textContent=v;});
+}
+
+function renderArchive(){
+  const grid=document.getElementById('archive-grid');grid.innerHTML='';
+  const maxIdx=Math.min(Math.max(0,getDayNum()),PUZZLES.length-1);
+  PUZZLES.forEach((puz,idx)=>{
+    if(idx>maxIdx)return;
+    const card=document.createElement('div');card.className='archive-card';
+    const sess=storage.sessions['p'+idx];const status=sess?.solved?'✓':sess?.failed?'✗':'';
+    card.innerHTML='<div><div class="archive-card-title">'+(status?status+' ':'')+puz.team1+' vs '+puz.team2+'</div><div class="archive-card-sub">'+puz.competition+' · '+puz.date+'</div></div><div class="archive-card-arrow">›</div>';
+    card.addEventListener('click',()=>{loadPuzzle(idx);setView('game');});
+    grid.appendChild(card);
+  });
+}
+
+function showShareOptions(text){
+  if(navigator.share&&/Mobi|Android/i.test(navigator.userAgent)){navigator.share({text}).catch(()=>copyToClipboard(text));return;}
+  copyToClipboard(text);
+  const waUrl='https://wa.me/?text='+encodeURIComponent(text);
+  const existing=document.querySelector('.toast');if(existing)existing.remove();
+  const t=document.createElement('div');t.className='toast';t.style.cssText='display:flex;align-items:center;gap:.75rem;';
+  t.innerHTML='<span>Copied!</span><a href="'+waUrl+'" target="_blank" style="color:#25D366;font-weight:600;text-decoration:none;font-size:13px;">WhatsApp ↗</a>';
+  document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
+}
+
+function shareResult(){
+  const pips=getPipStates().filter(p=>p!==null);
+  const icons=pips.map(p=>p==='correct'?'🟩':'🟥').join('');
+  const guessNum=pips.length;
+  const line1='⚽ Missing Goalscorer #'+puzzle.id;
+  const line2=state.solved?icons+'  Solved in '+guessNum+'!':icons+'  Not today!';
+  const line3='missingfootball.com/missing-goalscorer';
+  showShareOptions(line1+'\n'+line2+'\n'+line3);
+}
+
+function copyToClipboard(text){
+  navigator.clipboard.writeText(text).catch(()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});
+}
+
+function setView(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelector('[data-view="'+view+'"]').classList.add('active');
+  if(view==='stats')renderStats();if(view==='archive')renderArchive();
+}
+</script>
+</body>
+</html>
