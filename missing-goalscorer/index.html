@@ -1214,21 +1214,52 @@ function showEndState(won,puz){
   showCompletionMessage(won);
 }
 
+function getDailyScore() {
+  let score = 0;
+  // Missing XI — missingxi_v1
+  try {
+    const xi = JSON.parse(localStorage.getItem('missingxi_v1') || '{}');
+    const sessions = xi.sessions || {};
+    Object.values(sessions).forEach(s => { if (s.won === true || s.solved === true) score++; });
+  } catch(e) {}
+  // Missing Club — missingclub_v1
+  try {
+    const mc = JSON.parse(localStorage.getItem('missingclub_v1') || '{}');
+    const sessions = mc.sessions || {};
+    Object.values(sessions).forEach(s => { if (s.solved === true) score++; });
+  } catch(e) {}
+  // Missing Gaffer — missinggaffer_v1
+  try {
+    const mg = JSON.parse(localStorage.getItem('missinggaffer_v1') || '{}');
+    const sessions = mg.sessions || {};
+    Object.values(sessions).forEach(s => { if (s.solved === true) score++; });
+  } catch(e) {}
+  // Trophy Cabinet — tc-game-{n}
+  try {
+    for (let i = 1; i <= 60; i++) {
+      const tc = JSON.parse(localStorage.getItem('tc-game-' + i) || '{}');
+      if (tc.solved === true) { score++; break; }
+    }
+  } catch(e) {}
+  // Missing Goalscorer — mg-game-{n}
+  try {
+    for (let i = 1; i <= 60; i++) {
+      const mg2 = JSON.parse(localStorage.getItem('mg-game-' + i) || '{}');
+      if (mg2.solved === true) { score++; break; }
+    }
+  } catch(e) {}
+  return Math.min(score, 5);
+}
+
 function showCompletionMessage(won){
-  const today=new Date().toISOString().slice(0,10);
-  const others=[
-    {lp:'xi_lastPlayed',lr:'xi_lastResult'},
-    {lp:'mc_lastPlayed',lr:'mc_lastResult'},
-    {lp:'tc_lastPlayed',lr:'tc_lastResult'},
-    {lp:'mf_lastPlayed',lr:'mf_lastResult'}
-  ];
-  let wins=won?1:0;
-  others.forEach(g=>{if(localStorage.getItem(g.lp)===today&&localStorage.getItem(g.lr)==='win')wins++;});
+  // Save result now so getDailyScore() can read it (saveSession runs after showEndState)
+  localStorage.setItem('mg-game-'+puzzle.id,JSON.stringify({solved:won,failed:!won}));
+  const score=getDailyScore();
   const dateStr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   const row=document.getElementById('completion-row');
   row.innerHTML='<div style="padding:10px 0;border-top:1px solid var(--border);margin-top:6px">'
     +'<div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:4px">🎉 You\'ve played all 5 games today! Come back tomorrow for 5 new puzzles.</div>'
-    +'<div>'+dateStr+' &mdash; Daily score: <strong style="color:var(--accent)">'+wins+'/5</strong></div>'
+    +'<div>'+dateStr+' &mdash; Daily score: <strong style="color:var(--accent)">'+score+'/5</strong></div>'
     +'</div>';
   row.style.display='block';
 }
@@ -1266,6 +1297,7 @@ function saveSession(){
       localStorage.setItem('mg_lastResult','loss');
     }
     localStorage.setItem('mg_lastPlayed',todayUTC);
+    localStorage.setItem('mg-game-'+puzzle.id,JSON.stringify({solved:state.solved,failed:state.failed}));
   }
 }
 
