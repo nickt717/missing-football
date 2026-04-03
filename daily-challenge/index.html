@@ -190,9 +190,11 @@ const todayKey = 'dc-' + Math.floor((new Date() - DC_EPOCH) / 86400000);
 let currentGame = 0;
 let results = [];
 let waitingForNext = false;
+const testMode = window.location.search.includes('test');
 
 // Check if already completed today
 (function init(){
+  if(testMode){setView('view-intro');return;}
   try {
     const saved = JSON.parse(localStorage.getItem(todayKey)||'{}');
     if(saved.completed){
@@ -213,6 +215,12 @@ function setView(id){
 
 function startChallenge(){
   currentGame=0;results=[];waitingForNext=false;
+  if(testMode){
+    for(let i=GAMES.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [GAMES[i],GAMES[j]]=[GAMES[j],GAMES[i]];
+    }
+  }
   setView('view-game');
   loadGame(0);
 }
@@ -282,9 +290,11 @@ window.addEventListener('message',function(e){
 
 function saveAndShowResults(){
   const score=results.filter(r=>r==='win').length;
-  try{
-    localStorage.setItem(todayKey,JSON.stringify({score:score,results:results,completed:true}));
-  }catch(e){}
+  if(!testMode){
+    try{
+      localStorage.setItem(todayKey,JSON.stringify({score:score,results:results,completed:true}));
+    }catch(e){}
+  }
   showResults(results);
 }
 
