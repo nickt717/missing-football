@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Dev Reset</title></head>
+<body>
+<script>
+localStorage.removeItem('dc-9');
+localStorage.removeItem('dc-2026-04-03');
+
+['missingxi_v1', 'missingclub_v1', 'missinggaffer_v1', 'mg_v1'].forEach(function(key) {
+  try {
+    var d = JSON.parse(localStorage.getItem(key) || '{}');
+    if (d.sessions) { delete d.sessions['p9']; }
+    localStorage.setItem(key, JSON.stringify(d));
+  } catch(e) {}
+});
+
+localStorage.removeItem('tc-game-9');
+localStorage.removeItem('mg-game-9');
+localStorage.removeItem('mg-game-24');
+localStorage.removeItem('mg_lastPlayed');
+localStorage.removeItem('mg_lastResult');
+</script>
+<p>Reset complete. Today's puzzles cleared.</p>
+<p><a href="/daily-challenge/">← Back to Daily Challenge</a></p>
+</body>
+</html>
