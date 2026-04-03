@@ -1055,7 +1055,7 @@ function saveStorage(d){try{localStorage.setItem('mg_v1',JSON.stringify(d));}cat
 function defaultStats(){return{played:0,wins:0,streak:0,bestStreak:0,dist:{1:0,2:0,3:0,miss:0}};}
 let storage=loadStorage();
 
-function getDayNum(){return Math.floor((Date.now()-new Date('2026-02-02T00:00:00Z').getTime())/86400000);}
+function getDayNum(){return Math.floor((Date.now()-new Date('2026-03-25T00:00:00Z').getTime())/86400000);}
 function getDailyPuzzleIndex(){const d=getDayNum();return d<0?0:d%ORDERED_PUZZLES.length;}
 function normalise(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s]/g,"").trim();}
 function checkGuess(guess,puz){
@@ -1216,7 +1216,7 @@ function showEndState(won,puz){
 }
 
 function getDailyScore() {
-  const epoch = new Date('2026-04-01T00:00:00Z');
+  const epoch = new Date('2026-03-25T00:00:00Z');
   const today = new Date();
   const dayNum = Math.floor((today - epoch) / 86400000) + 1;
   let score = 0;

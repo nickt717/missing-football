@@ -182,7 +182,8 @@ const GAMES = [
   {name:'Missing Goalscorer',url:'/missing-goalscorer/'}
 ];
 
-const todayKey = 'dc-' + new Date().toISOString().slice(0,10);
+const DC_EPOCH = new Date('2026-03-25T00:00:00Z');
+const todayKey = 'dc-' + Math.floor((new Date() - DC_EPOCH) / 86400000);
 let currentGame = 0;
 let results = [];
 let waitingForNext = false;

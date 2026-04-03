@@ -224,7 +224,7 @@ function loadStorage(){try{const r=localStorage.getItem('missingclub_v1');return
 function saveStorage(d){try{localStorage.setItem('missingclub_v1',JSON.stringify(d));}catch{}}
 function defaultStats(){return{played:0,wins:0,streak:0,bestStreak:0,dist:{1:0,2:0,3:0,miss:0}};}
 let storage=loadStorage();
-function getDayNum(){return Math.floor((new Date()-new Date('2026-04-01'))/86400000);}function getDailyPuzzleIndex(){const d=getDayNum();return d<0?0:d%PUZZLES.length;}
+function getDayNum(){return Math.floor((new Date()-new Date('2026-03-25T00:00:00Z'))/86400000);}function getDailyPuzzleIndex(){const d=getDayNum();return d<0?0:d%PUZZLES.length;}
 function normalise(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s]/g,"").trim();}
 function checkGuess(guess,puzzle){const g=normalise(guess);return puzzle.acceptedAnswers.some(a=>normalise(a)===g);}
 document.addEventListener('DOMContentLoaded',()=>{state.puzzleIndex=getDailyPuzzleIndex();loadPuzzle(state.puzzleIndex);document.getElementById('puzzle-badge').textContent='PUZZLE #'+Math.max(1,getDayNum()+1);renderArchive();renderStats();document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitGuess();});});

@@ -1004,7 +1004,7 @@ const PUZZLES = [
     ]  }
 ];
 const MAX_ATTEMPTS = 3;
-const EPOCH = new Date('2026-04-01');
+const EPOCH = new Date('2026-03-25T00:00:00Z');
 const dayNum = Math.floor((Date.now() - EPOCH.getTime()) / 86400000);
 const puzzleIndex = dayNum < 0 ? 0 : dayNum % PUZZLES.length;
 const puzzle = PUZZLES[puzzleIndex];
