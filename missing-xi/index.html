@@ -21,6 +21,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 
 /* HEADER */
 .site-header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+html.in-iframe .site-header{display:none}
 .header-inner{max-width:560px;margin:0 auto;padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
 .logo{font-family:'Bebas Neue',sans-serif;letter-spacing:.04em;line-height:1}
 .logo-main{font-size:22px;color:var(--text-primary)}
@@ -46,7 +47,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 
 /* PITCH */
 .pitch-container{border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6);margin-bottom:.6rem}
-.pitch{position:relative;width:100%;padding-bottom:130%;background:var(--green-pitch)}
+.pitch{position:relative;width:100%;padding-bottom:min(130%,calc(100vh - 280px));background:var(--green-pitch)}
 .pitch-svg{position:absolute;inset:0;width:100%;height:100%}
 .players-layer{position:absolute;inset:0}
 
@@ -634,6 +635,7 @@ let storage=loadStorage();
 // INIT
 // ═══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
+if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}
   state.puzzleIndex=getDailyPuzzleIndex();
   loadPuzzle(state.puzzleIndex);
   document.getElementById('puzzle-badge').textContent='Puzzle #'+Math.max(1,getDayNum()+1);
