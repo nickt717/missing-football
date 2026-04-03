@@ -64,8 +64,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 .progress-game-name{font-size:12px;color:var(--text-muted);text-align:right;white-space:nowrap}
 
 /* Iframe */
-.game-frame-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--bg-card)}
-#game-frame{width:100%;height:650px;border:none;display:block}
+#view-game{overflow:hidden}
+.game-frame-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--bg-card);height:calc(100vh - 110px)}
+#game-frame{width:100%;height:100%;border:none;display:block}
 
 /* Transition overlay */
 .game-transition{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:2.5rem;text-align:center;display:none}
@@ -82,7 +83,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 .score-denom{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--text-muted)}
 .emoji-row{font-size:28px;letter-spacing:.15em;margin-bottom:2rem;line-height:1}
 
-.share-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.share-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:10px}
+#view-results{padding-top:.75rem;padding-bottom:.75rem;max-height:calc(100vh - 60px);overflow-y:auto}
 .share-preview{font-family:'Inter',sans-serif;font-size:13px;color:var(--text-muted);white-space:pre-line;line-height:1.8;margin-bottom:1rem}
 .copy-btn{width:100%;padding:11px;background:var(--accent);border:none;border-radius:var(--radius-sm);color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
 .copy-btn:hover{background:#5a9bff}
@@ -206,6 +208,7 @@ function setView(id){
     const el=document.getElementById(v);
     if(el) el.classList.toggle('active', v===id);
   });
+  window.scrollTo(0,0);
 }
 
 function startChallenge(){
@@ -298,8 +301,6 @@ function showResults(res){
 
   const shareText='⚽ Missing Football Daily Challenge\n'+dateStr+' — '+score+'/5\n'+emojis+'\nmissingfootball.com/daily-challenge';
   document.getElementById('share-preview').textContent=shareText;
-  if(navigator.share){document.getElementById('share-btn').style.display='block';}
-
   startCountdown();
 }
 
@@ -326,6 +327,10 @@ function copyResult(){
     document.body.removeChild(ta);
   }
 }
+
+document.addEventListener('DOMContentLoaded',function(){
+  if(navigator.share){document.getElementById('share-btn').style.display='block';}
+});
 
 function startCountdown(){
   function update(){
