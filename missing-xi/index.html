@@ -636,7 +636,7 @@ let storage=loadStorage();
 // INIT
 // ═══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
-if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}
+try{if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}}catch(e){document.documentElement.classList.add('in-iframe');}
   state.puzzleIndex=getDailyPuzzleIndex();
   loadPuzzle(state.puzzleIndex);
   document.getElementById('puzzle-badge').textContent='Puzzle #'+Math.max(1,getDayNum()+1);

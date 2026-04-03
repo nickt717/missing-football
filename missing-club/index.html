@@ -230,7 +230,7 @@ function getDayNum(){return Math.floor((new Date()-new Date('2026-03-25T00:00:00
 function normalise(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s]/g,"").trim();}
 function checkGuess(guess,puzzle){const g=normalise(guess);return puzzle.acceptedAnswers.some(a=>normalise(a)===g);}
 document.addEventListener('DOMContentLoaded',()=>{
-if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}
+try{if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}}catch(e){document.documentElement.classList.add('in-iframe');}
 state.puzzleIndex=getDailyPuzzleIndex();loadPuzzle(state.puzzleIndex);document.getElementById('puzzle-badge').textContent='PUZZLE #'+Math.max(1,getDayNum()+1);renderArchive();renderStats();document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitGuess();});});
 function loadPuzzle(idx){
   puzzle=PUZZLES[idx];state.puzzleIndex=idx;state.attempts=0;state.solved=false;state.failed=false;state.hintUsed=false;

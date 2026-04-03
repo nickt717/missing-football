@@ -1292,7 +1292,7 @@ function setView(v) {
   if (v === 'stats') renderStats();
   if (v === 'game') { renderPuzzle(); renderTrophies(); renderPips(); }
 }
-if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}
+try{if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}}catch(e){document.documentElement.classList.add('in-iframe');}
 init();
 </script>
 </body>
