@@ -329,6 +329,30 @@ function copyResult(){
 }
 
 document.addEventListener('DOMContentLoaded',function(){
+  // Dev reset: ?reset=dev clears all today's game states then redirects
+  if(new URLSearchParams(window.location.search).get('reset')==='dev'){
+    const puzzleIndex=Math.floor((Date.now()-new Date('2026-04-01T00:00:00Z').getTime())/86400000);
+    const dateStr=new Date().toISOString().slice(0,10);
+    // Remove daily challenge keys
+    localStorage.removeItem('dc-'+dateStr);
+    localStorage.removeItem('dc-'+puzzleIndex);
+    // Clear session data only for each game storage key
+    ['missingxi_v1','missingclub_v1','missinggaffer_v1','mg_v1'].forEach(function(key){
+      try{
+        const d=JSON.parse(localStorage.getItem(key)||'{}');
+        delete d.sessions;
+        localStorage.setItem(key,JSON.stringify(d));
+      }catch(e){}
+    });
+    // Remove misc goalscorer + trophy cabinet keys
+    localStorage.removeItem('mg_lastPlayed');
+    localStorage.removeItem('mg_lastResult');
+    localStorage.removeItem('tc-game-'+puzzleIndex);
+    localStorage.removeItem('mg-game-'+puzzleIndex);
+    console.log('Dev reset complete - all today\'s game states cleared');
+    window.location.href='/daily-challenge/';
+    return;
+  }
   if(navigator.share){document.getElementById('share-btn').style.display='block';}
 });
 
