@@ -163,6 +163,7 @@ footer{text-align:center;padding:2rem 1.5rem;border-top:1px solid var(--border);
   </div>
   <div class="share-card">
     <div class="share-preview" id="share-preview"></div>
+    <button class="copy-btn" id="share-btn" onclick="shareResult()" style="display:none;margin-bottom:.5rem">📤 Share Result</button>
     <button class="copy-btn" id="copy-btn" onclick="copyResult()">Copy Result</button>
   </div>
   <div class="countdown-box" id="countdown-box">Next challenge in <strong id="countdown-val">...</strong></div>
@@ -297,8 +298,14 @@ function showResults(res){
 
   const shareText='⚽ Missing Football Daily Challenge\n'+dateStr+' — '+score+'/5\n'+emojis+'\nmissingfootball.com/daily-challenge';
   document.getElementById('share-preview').textContent=shareText;
+  if(navigator.share){document.getElementById('share-btn').style.display='block';}
 
   startCountdown();
+}
+
+function shareResult(){
+  const text=document.getElementById('share-preview').textContent;
+  navigator.share({text:text}).catch(function(){});
 }
 
 function copyResult(){
