@@ -1215,39 +1215,44 @@ function showEndState(won,puz){
 }
 
 function getDailyScore() {
+  const epoch = new Date('2026-04-01T00:00:00Z');
+  const today = new Date();
+  const dayNum = Math.floor((today - epoch) / 86400000) + 1;
   let score = 0;
-  // Missing XI — missingxi_v1
+
+  // Missing XI — session key is p{dayNum-1}
   try {
     const xi = JSON.parse(localStorage.getItem('missingxi_v1') || '{}');
-    const sessions = xi.sessions || {};
-    Object.values(sessions).forEach(s => { if (s.won === true || s.solved === true) score++; });
+    const s = (xi.sessions || {})['p' + (dayNum - 1)];
+    if (s && (s.solved === true || s.won === true)) score++;
   } catch(e) {}
-  // Missing Club — missingclub_v1
+
+  // Missing Club — session key is p{dayNum}
   try {
     const mc = JSON.parse(localStorage.getItem('missingclub_v1') || '{}');
-    const sessions = mc.sessions || {};
-    Object.values(sessions).forEach(s => { if (s.solved === true) score++; });
+    const s = (mc.sessions || {})['p' + dayNum];
+    if (s && s.solved === true) score++;
   } catch(e) {}
-  // Missing Gaffer — missinggaffer_v1
+
+  // Missing Gaffer — session key is p{dayNum}
   try {
-    const mg = JSON.parse(localStorage.getItem('missinggaffer_v1') || '{}');
-    const sessions = mg.sessions || {};
-    Object.values(sessions).forEach(s => { if (s.solved === true) score++; });
+    const mf = JSON.parse(localStorage.getItem('missinggaffer_v1') || '{}');
+    const s = (mf.sessions || {})['p' + dayNum];
+    if (s && s.solved === true) score++;
   } catch(e) {}
-  // Trophy Cabinet — tc-game-{n}
+
+  // Trophy Cabinet — tc-game-{dayNum}
   try {
-    for (let i = 1; i <= 60; i++) {
-      const tc = JSON.parse(localStorage.getItem('tc-game-' + i) || '{}');
-      if (tc.solved === true) { score++; break; }
-    }
+    const tc = JSON.parse(localStorage.getItem('tc-game-' + dayNum) || '{}');
+    if (tc.solved === true) score++;
   } catch(e) {}
-  // Missing Goalscorer — mg-game-{n}
+
+  // Missing Goalscorer — mg-game-{puzzleId} where puzzleId matches today's puzzle
   try {
-    for (let i = 1; i <= 60; i++) {
-      const mg2 = JSON.parse(localStorage.getItem('mg-game-' + i) || '{}');
-      if (mg2.solved === true) { score++; break; }
-    }
+    const mg = JSON.parse(localStorage.getItem('mg-game-' + dayNum) || '{}');
+    if (mg.solved === true) score++;
   } catch(e) {}
+
   return Math.min(score, 5);
 }
 
