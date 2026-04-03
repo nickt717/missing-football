@@ -230,7 +230,8 @@ function loadPuzzle(idx){
   renderTimeline(puzzle,false);resetPips();
   document.getElementById('result-banner').innerHTML='';const _hr=document.getElementById('hint-reveal');_hr.innerHTML='';_hr.style.display='none';
   document.getElementById('post-game-btns').style.display='none';document.getElementById('next-game-row').style.display='none';document.getElementById('guess-section').style.display='block';document.getElementById('guess-input').value='';
-  const saved=storage.sessions['p'+idx];
+  const testMode=window.location.search.includes('test=1');
+  const saved=testMode?null:storage.sessions['p'+idx];
   if(saved){
     state.attempts=saved.attempts;state.solved=saved.solved;state.failed=saved.failed;state.hintsRevealed=saved.hintsRevealed||0;
     renderHints();

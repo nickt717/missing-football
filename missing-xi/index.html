@@ -674,7 +674,8 @@ function loadPuzzle(idx){
   inp.value=''; inp.disabled=false;
   document.querySelector('.guess-btn').disabled=false;
 
-  if(saved&&(saved.dayNum===undefined||saved.dayNum===getDayNum())){
+  const testMode=window.location.search.includes('test=1');
+  if(!testMode&&saved&&(saved.dayNum===undefined||saved.dayNum===getDayNum())){
     state.attempts=saved.attempts||0; state.solved=saved.solved||false; state.failed=saved.failed||false;
     state.foundCount=saved.foundCount||0; state.foundIndices=saved.foundIndices||[];
     state.wrongCount=saved.wrongCount||0; state.gameOver=saved.gameOver||false;

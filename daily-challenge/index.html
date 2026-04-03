@@ -241,7 +241,7 @@ function loadGame(idx){
   // Show iframe, hide transition
   document.getElementById('frame-wrap').style.display='block';
   document.getElementById('game-transition').style.display='none';
-  document.getElementById('game-frame').src=GAMES[idx].url;
+  document.getElementById('game-frame').src=GAMES[idx].url+(testMode?'?test=1':'');
 }
 
 // Listen for game completion

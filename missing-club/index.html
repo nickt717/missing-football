@@ -237,7 +237,8 @@ function loadPuzzle(idx){
   document.getElementById('result-banner').innerHTML='';document.getElementById('hint-reveal').innerHTML='';
   document.getElementById('post-game-btns').style.display='none';document.getElementById('next-game-row').style.display='none';document.getElementById('guess-section').style.display='block';document.getElementById('guess-input').value='';
   const hb=document.getElementById('hint-btn');if(hb){hb.classList.remove('used');hb.disabled=true;}
-  const saved=storage.sessions['p'+idx];
+  const testMode=window.location.search.includes('test=1');
+  const saved=testMode?null:storage.sessions['p'+idx];
   if(saved){state.attempts=saved.attempts;state.solved=saved.solved;state.failed=saved.failed;state.hintUsed=saved.hintUsed||false;const hintBtnS=document.getElementById('hint-btn');if(state.hintUsed){if(hintBtnS){hintBtnS.classList.add('used');hintBtnS.disabled=true;}if(saved.hintText)document.getElementById('hint-reveal').innerHTML=saved.hintText;}else if(state.attempts>=2&&!state.solved&&!state.failed){if(hintBtnS)hintBtnS.disabled=false;}[0,1,2].forEach((pip,i)=>{const el=document.getElementById('pip-'+i);if(el&&saved.pips&&saved.pips[i])el.classList.add(saved.pips[i]);});if(state.solved||state.failed)showEndState(state.solved,puzzle);renderTimeline(puzzle,state.solved||state.failed);}
 }
 function renderTimeline(puzzle,reveal){

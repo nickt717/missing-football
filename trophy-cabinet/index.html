@@ -1014,7 +1014,8 @@ let state = { attempts: 0, solved: false, failed: false, hintUsed: false, guesse
 let statsData = { played: 0, won: 0, streak: 0, dist: { 1: 0, 2: 0, 3: 0, miss: 0 } };
 function init() {
   loadStats();
-  const saved = localStorage.getItem(STORAGE_KEY);
+  const testMode = window.location.search.includes('test=1');
+  const saved = testMode ? null : localStorage.getItem(STORAGE_KEY);
   if (saved) state = JSON.parse(saved);
   renderPuzzle();
   renderPips();
