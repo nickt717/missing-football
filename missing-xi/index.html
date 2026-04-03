@@ -21,7 +21,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 
 /* HEADER */
 .site-header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-html.in-iframe .site-header{display:none}
 .header-inner{max-width:560px;margin:0 auto;padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
 .logo{font-family:'Bebas Neue',sans-serif;letter-spacing:.04em;line-height:1}
 .logo-main{font-size:22px;color:var(--text-primary)}
@@ -140,6 +139,10 @@ html.in-iframe .site-header{display:none}
   .stat-num{font-size:26px}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
 }
+@media (max-height: 800px) {
+  .site-header { display: none; }
+}
+body.embedded .site-header { display: none; }
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5496535965795902" crossorigin="anonymous"></script>
 </head>
@@ -246,6 +249,7 @@ html.in-iframe .site-header{display:none}
 </main>
 
 <script>
+if (new URLSearchParams(window.location.search).get('embed') === '1') { document.body.classList.add('embedded'); }
 // ═══════════════════════════════════════════════════
 // PUZZLE DATA
 // ═══════════════════════════════════════════════════
@@ -636,7 +640,6 @@ let storage=loadStorage();
 // INIT
 // ═══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
-try{if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}}catch(e){document.documentElement.classList.add('in-iframe');}
   state.puzzleIndex=getDailyPuzzleIndex();
   loadPuzzle(state.puzzleIndex);
   document.getElementById('puzzle-badge').textContent='Puzzle #'+Math.max(1,getDayNum()+1);

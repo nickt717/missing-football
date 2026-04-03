@@ -17,7 +17,6 @@
 html{scroll-behavior:smooth}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;padding-bottom:3rem}
 .site-header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-html.in-iframe .site-header{display:none}
 .header-inner{max-width:560px;margin:0 auto;padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
 .logo{font-family:'Bebas Neue',sans-serif;letter-spacing:.04em;line-height:1;text-align:center}
 .logo-main{font-size:22px;color:var(--text-primary)}
@@ -88,6 +87,10 @@ html.in-iframe .site-header{display:none}
 .dist-bar{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
 .dist-n{font-size:12px;color:var(--text-muted);width:24px;text-align:right;flex-shrink:0}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-size:13px;padding:.6rem 1.1rem;z-index:999;pointer-events:none;white-space:nowrap}
+@media (max-height: 800px) {
+  .site-header { display: none; }
+}
+body.embedded .site-header { display: none; }
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5496535965795902" crossorigin="anonymous"></script>
 </head>
@@ -151,6 +154,7 @@ html.in-iframe .site-header{display:none}
   <div class="dist-row"><div class="dist-label">Miss</div><div class="dist-bar-wrap"><div class="dist-bar" id="dist-miss" style="width:0%"></div></div><div class="dist-n" id="dist-miss-n">0</div></div>
 </div>
 <script>
+if (new URLSearchParams(window.location.search).get('embed') === '1') { document.body.classList.add('embedded'); }
 const PUZZLES = [
   {id:1,manager:"José Mourinho",nationality:"Portuguese",answer:"Inter Milan",acceptedAnswers:["inter milan","inter","internazionale","fc inter"],hints:["Serie A, Italian top flight","Milan — but not the red half","Mourinho won the treble here in 2009-10"],clubs:[{name:"Chelsea",years:"2004–07",league:"Premier League"},{name:"???",years:"2008–10",league:"Serie A"},{name:"Real Madrid",years:"2010–13",league:"La Liga"},{name:"Chelsea",years:"2013–15",league:"Premier League"},{name:"Man United",years:"2016–18",league:"Premier League"},{name:"Spurs",years:"2019–21",league:"Premier League"},{name:"Roma",years:"2021–24",league:"Serie A"}]},
   {id:2,manager:"Pep Guardiola",nationality:"Spanish",answer:"Bayern Munich",acceptedAnswers:["bayern munich","bayern","fc bayern","fc bayern munich"],hints:["Bundesliga, German top flight","Bavaria, southern Germany","Guardiola won the Bundesliga all 3 seasons here"],clubs:[{name:"Barcelona B",years:"2007–08",league:"Segunda B"},{name:"Barcelona",years:"2008–12",league:"La Liga"},{name:"???",years:"2013–16",league:"Bundesliga"},{name:"Man City",years:"2016–",league:"Premier League"}]},
@@ -224,7 +228,6 @@ function getDayNum(){return Math.floor((new Date()-new Date('2026-03-25T00:00:00
 function normalise(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s]/g,"").trim();}
 function checkGuess(guess,puz){const g=normalise(guess);return puz.acceptedAnswers.some(a=>normalise(a)===g);}
 document.addEventListener('DOMContentLoaded',()=>{
-try{if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}}catch(e){document.documentElement.classList.add('in-iframe');}
 state.puzzleIndex=getDailyPuzzleIndex();loadPuzzle(state.puzzleIndex);document.getElementById('puzzle-badge').textContent='PUZZLE #'+Math.max(1,getDayNum()+1);renderArchive();renderStats();document.getElementById('guess-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitGuess();});});
 function loadPuzzle(idx){
   puzzle=PUZZLES[idx];state.puzzleIndex=idx;state.attempts=0;state.solved=false;state.failed=false;state.hintsRevealed=0;
