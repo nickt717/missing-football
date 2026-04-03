@@ -1135,6 +1135,7 @@ function submitGuess() {
     document.getElementById('share-btn').classList.add('visible');
     setTimeout(()=>{document.getElementById('next-game-row').style.display='block';},2500);
     recordResult(true);
+    if(window.parent!==window){window.parent.postMessage({type:'gameComplete',result:'win'},'*');}
   } else if (state.attempts >= MAX_ATTEMPTS) {
     state.failed = true;
     showBanner('The answer was <strong>' + puzzle.player + '</strong>', 'fail');
@@ -1142,6 +1143,7 @@ function submitGuess() {
     document.getElementById('share-btn').classList.add('visible');
     setTimeout(()=>{document.getElementById('next-game-row').style.display='block';},2500);
     recordResult(false);
+    if(window.parent!==window){window.parent.postMessage({type:'gameComplete',result:'loss'},'*');}
   } else {
     const remaining = MAX_ATTEMPTS - state.attempts;
     showBanner('✗ Not quite — ' + remaining + ' attempt' + (remaining === 1 ? '' : 's') + ' left', 'fail');

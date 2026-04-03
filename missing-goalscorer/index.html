@@ -1204,6 +1204,7 @@ function submitGuess(){
 }
 
 function showEndState(won,puz){
+  if(window.parent!==window){window.parent.postMessage({type:'gameComplete',result:won?'win':'loss'},'*');}
   const banner=document.getElementById('result-banner');
   if(won){banner.innerHTML='<div class="result-msg success">✓ Correct! The missing goalscorer was <strong>'+puz.hidden+'</strong></div>';}
   else{banner.innerHTML='<div class="result-msg fail">The missing goalscorer was <strong>'+puz.hidden+'</strong></div>';}

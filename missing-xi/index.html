@@ -815,6 +815,7 @@ function revealLostPlayers(team){
 // END STATE
 // ═══════════════════════════════════════════════════
 function showEndState(won){
+  if(window.parent!==window){window.parent.postMessage({type:'gameComplete',result:won?'win':'loss'},'*');}
   if(won) showBanner('⚽ Brilliant! You found all 5!','success');
   else showBanner('Unlucky! Come back tomorrow.','fail');
   document.getElementById('guess-input-row').style.display='none';

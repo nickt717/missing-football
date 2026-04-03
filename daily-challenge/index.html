@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Daily Challenge — Missing Football</title>
+<meta name="description" content="Play all 5 Missing Football puzzles in one go. One score every day.">
+<meta property="og:title" content="Daily Challenge — Missing Football">
+<meta property="og:description" content="All 5 puzzles. One score. Every day.">
+<meta property="og:url" content="https://missingfootball.com/daily-challenge/">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f0f;--bg-card:#1a1a1a;--bg-elevated:#242424;
+  --border:rgba(255,255,255,0.08);--border-strong:rgba(255,255,255,0.18);
+  --text-primary:#f2f0eb;--text-muted:#888;--text-dim:#555;
+  --accent:#3a86ff;--accent-dim:rgba(58,134,255,0.15);
+  --green:#27ae60;--red:#e03c31;
+  --radius:10px;--radius-sm:6px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;padding-bottom:3rem}
+
+/* Header */
+.site-header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.header-inner{max-width:620px;margin:0 auto;padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em;line-height:1;text-decoration:none;color:inherit}
+.logo-missing{color:var(--text-primary)}
+.logo-accent{color:var(--accent)}
+.home-link{color:var(--text-muted);font-size:12px;font-weight:500;text-decoration:none;letter-spacing:.02em;display:flex;align-items:center;gap:3px;transition:color .15s;white-space:nowrap}
+.home-link:hover{color:var(--text-primary)}
+
+/* Views */
+.view{display:none;max-width:620px;margin:0 auto;padding:1.5rem 1.25rem}
+.view.active{display:block}
+
+/* Intro */
+.intro-hero{text-align:center;padding:2.5rem 0 2rem}
+.intro-badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(58,134,255,0.3);border-radius:20px;padding:.3rem .9rem;margin-bottom:1.25rem}
+.intro-title{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:.04em;line-height:1;color:var(--text-primary);margin-bottom:.5rem}
+.intro-title span{color:var(--accent)}
+.intro-sub{font-size:15px;color:var(--text-muted);margin-bottom:2rem;line-height:1.6}
+.intro-games{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem;text-align:left}
+.intro-games-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.9rem}
+.intro-game-row{display:flex;align-items:center;gap:.75rem;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-muted)}
+.intro-game-row:last-child{border-bottom:none}
+.intro-game-num{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--accent);width:20px;flex-shrink:0}
+.intro-game-name{color:var(--text-primary);font-weight:500}
+.start-btn{width:100%;padding:14px;background:var(--accent);border:none;border-radius:var(--radius-sm);color:#fff;font-family:'Inter',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:.15s;letter-spacing:.02em}
+.start-btn:hover{background:#5a9bff}
+
+/* Progress bar */
+.progress-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem}
+.progress-label{font-size:13px;font-weight:600;color:var(--text-muted);white-space:nowrap;min-width:80px}
+.progress-dots{display:flex;gap:8px;flex:1}
+.progress-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--text-dim);background:transparent;transition:.3s;flex-shrink:0}
+.progress-dot.active{border-color:var(--accent);background:var(--accent-dim)}
+.progress-dot.win{border-color:var(--green);background:var(--green)}
+.progress-dot.loss{border-color:var(--red);background:var(--red)}
+.progress-game-name{font-size:12px;color:var(--text-muted);text-align:right;white-space:nowrap}
+
+/* Iframe */
+.game-frame-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--bg-card)}
+#game-frame{width:100%;height:650px;border:none;display:block}
+
+/* Transition overlay */
+.game-transition{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:2.5rem;text-align:center;display:none}
+.transition-icon{font-size:40px;margin-bottom:1rem}
+.transition-msg{font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:.5rem}
+.transition-next{font-size:13px;color:var(--text-muted)}
+
+/* Results */
+.results-hero{text-align:center;padding:2rem 0 1.5rem}
+.results-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:.04em;color:var(--text-primary);margin-bottom:.35rem}
+.results-date{font-size:13px;color:var(--text-muted);margin-bottom:1.5rem}
+.score-display{display:inline-flex;align-items:baseline;gap:.25rem;margin-bottom:1.5rem}
+.score-num{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;color:var(--accent)}
+.score-denom{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--text-muted)}
+.emoji-row{font-size:28px;letter-spacing:.15em;margin-bottom:2rem;line-height:1}
+
+.share-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.share-preview{font-family:'Inter',sans-serif;font-size:13px;color:var(--text-muted);white-space:pre-line;line-height:1.8;margin-bottom:1rem}
+.copy-btn{width:100%;padding:11px;background:var(--accent);border:none;border-radius:var(--radius-sm);color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.15s}
+.copy-btn:hover{background:#5a9bff}
+.copy-btn.copied{background:var(--green)}
+
+.countdown-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;text-align:center;font-size:13px;color:var(--text-muted)}
+.countdown-box strong{color:var(--text-primary)}
+
+/* Footer */
+footer{text-align:center;padding:2rem 1.5rem;border-top:1px solid var(--border);font-size:12px;color:var(--text-dim);margin-top:2rem}
+</style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5496535965795902" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="https://missingfootball.com" class="home-link">← Home</a>
+    <a class="logo" href="https://missingfootball.com/daily-challenge/">
+      <span class="logo-missing">DAILY </span><span class="logo-accent">CHALLENGE</span>
+    </a>
+    <div style="width:60px"></div>
+  </div>
+</header>
+
+<!-- INTRO VIEW -->
+<div class="view active" id="view-intro">
+  <div class="intro-hero">
+    <div class="intro-badge">Daily Challenge</div>
+    <div class="intro-title">All 5 <span>Puzzles</span></div>
+    <div class="intro-sub">One score. Every day.<br>Play all 5 Missing Football games back to back.</div>
+    <div class="intro-games">
+      <div class="intro-games-title">Today's games</div>
+      <div class="intro-game-row"><span class="intro-game-num">1</span><span class="intro-game-name">Missing XI</span></div>
+      <div class="intro-game-row"><span class="intro-game-num">2</span><span class="intro-game-name">Missing Club</span></div>
+      <div class="intro-game-row"><span class="intro-game-num">3</span><span class="intro-game-name">Trophy Cabinet</span></div>
+      <div class="intro-game-row"><span class="intro-game-num">4</span><span class="intro-game-name">Missing Gaffer</span></div>
+      <div class="intro-game-row"><span class="intro-game-num">5</span><span class="intro-game-name">Missing Goalscorer</span></div>
+    </div>
+    <button class="start-btn" onclick="startChallenge()">Start Today's Challenge</button>
+  </div>
+</div>
+
+<!-- GAME VIEW -->
+<div class="view" id="view-game">
+  <div class="progress-bar">
+    <span class="progress-label" id="progress-label">Game 1 of 5</span>
+    <div class="progress-dots" id="progress-dots">
+      <div class="progress-dot active" id="dot-0"></div>
+      <div class="progress-dot" id="dot-1"></div>
+      <div class="progress-dot" id="dot-2"></div>
+      <div class="progress-dot" id="dot-3"></div>
+      <div class="progress-dot" id="dot-4"></div>
+    </div>
+    <span class="progress-game-name" id="progress-game-name">Missing XI</span>
+  </div>
+  <div class="game-frame-wrap" id="frame-wrap">
+    <iframe id="game-frame" src="" title="Daily Challenge Game" allow="storage-access"></iframe>
+  </div>
+  <div class="game-transition" id="game-transition">
+    <div class="transition-icon" id="transition-icon"></div>
+    <div class="transition-msg" id="transition-msg"></div>
+    <div class="transition-next" id="transition-next"></div>
+  </div>
+</div>
+
+<!-- RESULTS VIEW -->
+<div class="view" id="view-results">
+  <div class="results-hero">
+    <div class="intro-badge">Challenge Complete!</div>
+    <div class="results-title">🎉 Done!</div>
+    <div class="results-date" id="results-date"></div>
+    <div class="score-display">
+      <span class="score-num" id="results-score">0</span>
+      <span class="score-denom">/5</span>
+    </div>
+    <div class="emoji-row" id="results-emojis"></div>
+  </div>
+  <div class="share-card">
+    <div class="share-preview" id="share-preview"></div>
+    <button class="copy-btn" id="copy-btn" onclick="copyResult()">Copy Result</button>
+  </div>
+  <div class="countdown-box" id="countdown-box">Next challenge in <strong id="countdown-val">...</strong></div>
+</div>
+
+<footer>
+  missingfootball.com &mdash; a new puzzle every day
+  <div style="margin-top:.5rem;"><a href="/privacy-policy/" style="color:var(--text-dim);text-decoration:none;font-size:11px;">Privacy Policy</a></div>
+</footer>
+
+<script>
+const GAMES = [
+  {name:'Missing XI',    url:'/missing-xi/'},
+  {name:'Missing Club',  url:'/missing-club/'},
+  {name:'Trophy Cabinet',url:'/trophy-cabinet/'},
+  {name:'Missing Gaffer',url:'/missing-gaffer/'},
+  {name:'Missing Goalscorer',url:'/missing-goalscorer/'}
+];
+
+const todayKey = 'dc-' + new Date().toISOString().slice(0,10);
+let currentGame = 0;
+let results = [];
+let waitingForNext = false;
+
+// Check if already completed today
+(function init(){
+  try {
+    const saved = JSON.parse(localStorage.getItem(todayKey)||'{}');
+    if(saved.completed){
+      showResults(saved.results);
+      return;
+    }
+  } catch(e){}
+  setView('view-intro');
+})();
+
+function setView(id){
+  ['view-intro','view-game','view-results'].forEach(v=>{
+    const el=document.getElementById(v);
+    if(el) el.classList.toggle('active', v===id);
+  });
+}
+
+function startChallenge(){
+  currentGame=0;results=[];waitingForNext=false;
+  setView('view-game');
+  loadGame(0);
+}
+
+function loadGame(idx){
+  document.getElementById('progress-label').textContent='Game '+(idx+1)+' of 5';
+  document.getElementById('progress-game-name').textContent=GAMES[idx].name;
+  // Update dots
+  for(let i=0;i<5;i++){
+    const dot=document.getElementById('dot-'+i);
+    dot.className='progress-dot';
+    if(i<idx){
+      dot.classList.add(results[i]==='win'?'win':'loss');
+    } else if(i===idx){
+      dot.classList.add('active');
+    }
+  }
+  // Show iframe, hide transition
+  document.getElementById('frame-wrap').style.display='block';
+  document.getElementById('game-transition').style.display='none';
+  document.getElementById('game-frame').src=GAMES[idx].url;
+}
+
+// Listen for game completion
+window.addEventListener('message',function(e){
+  if(!e.data||e.data.type!=='gameComplete')return;
+  if(waitingForNext)return;
+  waitingForNext=true;
+
+  const result=e.data.result;
+  results[currentGame]=result;
+
+  const won=result==='win';
+  // Update current dot
+  const dot=document.getElementById('dot-'+currentGame);
+  dot.className='progress-dot '+(won?'win':'loss');
+
+  // Show transition overlay
+  const frameWrap=document.getElementById('frame-wrap');
+  const transition=document.getElementById('game-transition');
+  const icon=document.getElementById('transition-icon');
+  const msg=document.getElementById('transition-msg');
+  const nextEl=document.getElementById('transition-next');
+
+  icon.textContent=won?'⚽':'❌';
+  msg.textContent=won?'Correct! Well done.':'Unlucky!';
+
+  if(currentGame<GAMES.length-1){
+    nextEl.textContent='Loading '+GAMES[currentGame+1].name+' in 2 seconds…';
+    frameWrap.style.display='none';
+    transition.style.display='block';
+    setTimeout(function(){
+      currentGame++;
+      waitingForNext=false;
+      loadGame(currentGame);
+    },2000);
+  } else {
+    // All done
+    nextEl.textContent='';
+    frameWrap.style.display='none';
+    transition.style.display='block';
+    setTimeout(function(){
+      saveAndShowResults();
+    },1500);
+  }
+});
+
+function saveAndShowResults(){
+  const score=results.filter(r=>r==='win').length;
+  try{
+    localStorage.setItem(todayKey,JSON.stringify({score:score,results:results,completed:true}));
+  }catch(e){}
+  showResults(results);
+}
+
+function showResults(res){
+  setView('view-results');
+  const score=res.filter(r=>r==='win').length;
+  const emojis=res.map(r=>r==='win'?'⚽':'❌').join(' ');
+  const dateStr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const shortDate=new Date().toISOString().slice(0,10);
+
+  document.getElementById('results-score').textContent=score;
+  document.getElementById('results-date').textContent=dateStr;
+  document.getElementById('results-emojis').textContent=emojis;
+
+  const shareText='⚽ Missing Football Daily Challenge\n'+dateStr+' — '+score+'/5\n'+emojis+'\nmissingfootball.com/daily-challenge';
+  document.getElementById('share-preview').textContent=shareText;
+
+  startCountdown();
+}
+
+function copyResult(){
+  const text=document.getElementById('share-preview').textContent;
+  const btn=document.getElementById('copy-btn');
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent='Copied!';btn.classList.add('copied');
+      setTimeout(function(){btn.textContent='Copy Result';btn.classList.remove('copied');},2000);
+    });
+  } else {
+    const ta=document.createElement('textarea');
+    ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');btn.textContent='Copied!';btn.classList.add('copied');
+      setTimeout(function(){btn.textContent='Copy Result';btn.classList.remove('copied');},2000);
+    }catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+
+function startCountdown(){
+  function update(){
+    const now=new Date();
+    const midnight=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+1));
+    const diff=midnight-now;
+    if(diff<=0){document.getElementById('countdown-val').textContent='New challenge available!';return;}
+    const h=Math.floor(diff/3600000);
+    const m=Math.floor((diff%3600000)/60000);
+    const s=Math.floor((diff%60000)/1000);
+    document.getElementById('countdown-val').textContent=h+'h '+String(m).padStart(2,'0')+'m '+String(s).padStart(2,'0')+'s';
+  }
+  update();setInterval(update,1000);
+}
+</script>
+</body>
+</html>

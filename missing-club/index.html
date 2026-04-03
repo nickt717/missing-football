@@ -260,6 +260,7 @@ function submitGuess(){
   input.value='';saveSession();
 }
 function showEndState(won,puzzle){
+  if(window.parent!==window){window.parent.postMessage({type:'gameComplete',result:won?'win':'loss'},'*');}
   const banner=document.getElementById('result-banner');
   if(won){banner.innerHTML='<div class="result-msg success">✓ Correct! The missing club was <strong>'+puzzle.answer+'</strong></div>';}
   else{banner.innerHTML='<div class="result-msg fail">The missing club was <strong>'+puzzle.answer+'</strong></div>';}
