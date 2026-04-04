@@ -143,6 +143,50 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
   .site-header { display: none; }
 }
 body.embedded .site-header { display: none; }
+@media (max-width: 600px) {
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .view.active {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .puzzle-meta {
+    flex-shrink: 0;
+    padding-top: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .pitch-container {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+
+  .pitch {
+    padding-bottom: 0 !important;
+    height: 100%;
+  }
+
+  .guess-area {
+    flex-shrink: 0;
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-height: 800px) and (max-width: 600px) {
+  .site-header {
+    display: none;
+  }
+}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5496535965795902" crossorigin="anonymous"></script>
 </head>
