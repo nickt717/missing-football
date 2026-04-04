@@ -90,47 +90,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 .dist-n{font-size:12px;color:var(--text-muted);width:24px;text-align:right;flex-shrink:0}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary);font-size:13px;padding:.6rem 1.1rem;z-index:999;pointer-events:none;white-space:nowrap}
 @media (max-width: 600px) {
-  html, body {
-    height: 100%;
-    overflow: hidden;
-  }
-
-  .view.active {
-    display: flex;
-    flex-direction: column;
-    height: 100dvh;
-    overflow: hidden;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .puzzle-meta {
-    flex-shrink: 0;
-    padding-top: 0.75rem;
-    margin-bottom: 0.6rem;
-  }
-
-  .pitch-container {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-    margin-bottom: 0.5rem;
-  }
-
   .pitch {
-    padding-bottom: 0 !important;
-    height: 100%;
+    padding-bottom: min(95%, calc(55vh)) !important;
   }
-
   .guess-area {
-    flex-shrink: 0;
     padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
-  }
-}
-
-@media (max-height: 800px) and (max-width: 600px) {
-  .site-header {
-    display: none;
   }
 }
 </style>
