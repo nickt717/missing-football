@@ -73,6 +73,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 .transition-icon{font-size:40px;margin-bottom:1rem}
 .transition-msg{font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:.5rem}
 .transition-next{font-size:13px;color:var(--text-muted)}
+.next-game-btn {
+    display: none;
+    margin-top: 1.5rem;
+    padding: 0.75rem 2rem;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+  }
+  .next-game-btn:active { opacity: 0.85; }
 
 /* Results */
 .results-hero{text-align:center;padding:2rem 0 1.5rem}
@@ -148,6 +163,7 @@ footer{text-align:center;padding:2rem 1.5rem;border-top:1px solid var(--border);
     <div class="transition-icon" id="transition-icon"></div>
     <div class="transition-msg" id="transition-msg"></div>
     <div class="transition-next" id="transition-next"></div>
+    <button class="next-game-btn" id="next-game-btn" onclick="advanceGame()"></button>
   </div>
 </div>
 
@@ -268,25 +284,33 @@ window.addEventListener('message',function(e){
   icon.textContent=won?'⚽':'❌';
   msg.textContent=won?'Correct! Well done.':'Unlucky!';
 
+  const btn=document.getElementById('next-game-btn');
   if(currentGame<GAMES.length-1){
-    nextEl.textContent='Loading '+GAMES[currentGame+1].name+' in 2 seconds…';
+    nextEl.textContent='Take your time — tap when ready.';
+    btn.textContent='Next: '+GAMES[currentGame+1].name+' →';
     frameWrap.style.display='none';
     transition.style.display='block';
-    setTimeout(function(){
+    btn.style.display='block';
+  } else {
+    nextEl.textContent='All games complete!';
+    btn.textContent='See My Results →';
+    frameWrap.style.display='none';
+    transition.style.display='block';
+    btn.style.display='block';
+  }
+});
+
+function advanceGame(){
+    const btn=document.getElementById('next-game-btn');
+    btn.style.display='none';
+    if(currentGame<GAMES.length-1){
       currentGame++;
       waitingForNext=false;
       loadGame(currentGame);
-    },2000);
-  } else {
-    // All done
-    nextEl.textContent='';
-    frameWrap.style.display='none';
-    transition.style.display='block';
-    setTimeout(function(){
+    } else {
       saveAndShowResults();
-    },1500);
+    }
   }
-});
 
 function saveAndShowResults(){
   const score=results.filter(r=>r==='win').length;
