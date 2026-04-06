@@ -343,6 +343,17 @@ function copyToClipboard(text) {
   });
 }
 function setView(view){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('view-'+view).classList.add('active');document.querySelector('[data-view="'+view+'"]').classList.add('active');if(view==='stats')renderStats();if(view==='archive')renderArchive();}
+
+// Mobile keyboard: scroll input into view when keyboard opens
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', function() {
+    var input = document.querySelector('input[type=text]');
+    if (!input) return;
+    var row = input.closest('.guess-input-row') || input.closest('.input-row') || input.parentElement;
+    if (row && row.style.display === 'none') return;
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
 </script>
 </body>
 </html>

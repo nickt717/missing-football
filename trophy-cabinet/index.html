@@ -1305,6 +1305,17 @@ function setView(v) {
   if (v === 'game') { renderPuzzle(); renderTrophies(); renderPips(); }
 }
 init();
+
+// Mobile keyboard: scroll input into view when keyboard opens
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', function() {
+    var input = document.querySelector('input[type=text]');
+    if (!input) return;
+    var row = input.closest('.guess-input-row') || input.closest('.input-row') || input.parentElement;
+    if (row && row.style.display === 'none') return;
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
 </script>
 </body>
 </html>
