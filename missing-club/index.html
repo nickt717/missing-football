@@ -103,6 +103,47 @@ body.embedded .site-header { display: none; }
     padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
   }
 }
+
+@media (max-width: 600px) {
+  body { padding-bottom: 0; }
+
+  .view.active {
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 53px);
+    overflow: hidden;
+  }
+
+  .puzzle-meta { flex-shrink: 0; }
+
+  .timeline-card {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .guess-section {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 0.75rem 1.25rem;
+    margin-top: 0;
+    z-index: 50;
+  }
+
+  .post-game-btns {
+    flex-shrink: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 0.75rem 1.25rem;
+    margin-top: 0;
+  }
+}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5496535965795902" crossorigin="anonymous"></script>
 </head>
@@ -344,16 +385,6 @@ function copyToClipboard(text) {
 }
 function setView(view){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('view-'+view).classList.add('active');document.querySelector('[data-view="'+view+'"]').classList.add('active');if(view==='stats')renderStats();if(view==='archive')renderArchive();}
 
-// Mobile keyboard: scroll input into view when keyboard opens
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', function() {
-    var input = document.querySelector('input[type=text]');
-    if (!input) return;
-    var row = input.closest('.guess-input-row') || input.closest('.input-row') || input.parentElement;
-    if (row && row.style.display === 'none') return;
-    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  });
-}
 </script>
 </body>
 </html>

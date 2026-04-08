@@ -64,17 +64,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primar
 
 /* FORMATION LABEL */
 .formation-label{text-align:center;font-size:12px;color:var(--text-dim);margin-bottom:1rem;letter-spacing:.05em}
-.guessing-label {
-  text-align: center;
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 0.6rem;
-  letter-spacing: 0.04em;
-  min-height: 18px;
-}
-.guessing-label strong {
-  color: var(--accent);
-}
 
 /* GUESS AREA */
 .guess-area{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1rem .75rem}
@@ -162,6 +151,50 @@ body.embedded .site-header { display: none; }
     padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
   }
 }
+
+@media (max-width: 600px) {
+  body { padding-bottom: 0; }
+
+  #view-game.view.active {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 53px);
+    overflow: hidden;
+    padding-bottom: 0;
+  }
+
+  .puzzle-meta { flex-shrink: 0; }
+  .team-tabs { flex-shrink: 0; }
+  .formation-label { flex-shrink: 0; }
+
+  .pitch-container {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    margin-bottom: 0;
+  }
+
+  .pitch { padding-bottom: 0 !important; height: 100%; }
+
+  .guess-area {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    border-radius: 0;
+    z-index: 50;
+    padding: 0.75rem 1rem;
+  }
+
+  .post-game-btns {
+    flex-shrink: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 0.75rem 1.25rem;
+    margin-top: 0;
+  }
+}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5496535965795902" crossorigin="anonymous"></script>
 </head>
@@ -217,7 +250,6 @@ body.embedded .site-header { display: none; }
     </div>
   </div>
   <p class="formation-label" id="formation-label"></p>
-  <div class="guessing-label" id="guessing-label"></div>
   <div class="guess-area" id="guess-area">
     <div class="attempts-track" id="attempts-track">
       <div class="attempt-pip" id="pip-0"></div>
@@ -711,13 +743,6 @@ function loadPuzzle(idx){
     for(let wi=0;wi<state.wrongCount;wi++){const pip=document.getElementById(`pip-${wi}`);if(pip)pip.classList.add('wrong');}
     if(state.solved||state.failed||state.gameOver) showEndState(state.foundCount===5);
   }
-  const _missingPlayer = team.players[team.missingIndex];
-  const _gl = document.getElementById('guessing-label');
-  if (_gl) {
-    _gl.innerHTML = (state.solved || state.failed)
-      ? ''
-      : `Guessing: <strong>${_missingPlayer.role}</strong> · ${team.name}`;
-  }
   renderPitch(idx);
 }
 
@@ -853,8 +878,6 @@ function showEndState(won){
   if(won) showBanner('⚽ Brilliant! You found all 5!','success');
   else showBanner('Unlucky! Come back tomorrow.','fail');
   document.getElementById('guess-input-row').style.display='none';
-  const gl = document.getElementById('guessing-label');
-  if (gl) gl.innerHTML = '';
   document.getElementById('post-game-btns').style.display='flex';
   const inp=document.getElementById('guess-input');
   const btn=document.querySelector('.guess-btn');
